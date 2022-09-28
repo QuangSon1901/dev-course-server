@@ -7,12 +7,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Public router
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+
+// Auth
+Route::group(['prefix' => '/auth'], function() {
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
+});
 
 // TrainingProgram
-Route::get('/training-programs', [TrainingProgramController::class, 'show']);
-
+Route::group(['prefix' => '/training-programs'], function () { 
+    Route::get('/', [TrainingProgramController::class, 'show']);
+});
 
 
 // ================================================================
@@ -21,9 +26,13 @@ Route::get('/training-programs', [TrainingProgramController::class, 'show']);
 
 // Private router
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/auth', [UserController::class, 'getUser']);
 
+    // Auth
+    Route::group(['prefix' => '/auth'], function() {
+        Route::get('/', [UserController::class, 'getUser']);
+        Route::post('/logout', [AuthController::class, 'logout']);
+    });
+    
     // User
 
     // TrainingProgram
