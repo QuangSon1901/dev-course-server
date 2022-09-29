@@ -3,40 +3,34 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Program;
-use App\Models\Subject;
+use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
-use \Cviebrock\EloquentSluggable\Services\SlugService;
-use Illuminate\Support\Str;
 
-class SubjectController extends Controller
+class RoomController extends Controller
 {
     public function show() {
-        return Subject::all();
+        return Room::all();
     }
 
-    public function store(Subject $slug, Request $request) {
+    public function store(Request $request) {
 
         if (Gate::denies('role-admin')) return response(['message' => 'Xin lỗi! Bạn không có quyền thực hiện.'], 401);
 
         $validator = Validator::make(
             $request->all(),
             [
-                'program_id' => 'required',
-                'name' => 'required|string',
-                'price' => 'decimal',
+                'room' => 'required|string',
+                'address' => 'required|string',
             ],
             [
                 'required' => ':attribute không được để trống',
                 'string' => ':attribute phải là một chuỗi',
-                'decimal' => ':attribute phải là một số',
             ],
             [
-                'program_id' => 'Chương trình',
-                'name' => 'Tên môn học',
-                'price' => 'Giá',
+                'room' => 'Tên / Mã phòng',
+                'address' => 'Địa chỉ',
             ]
         );
 
@@ -44,29 +38,12 @@ class SubjectController extends Controller
             return response(['status' => 403, 'success' => 'danger', 'message' => $validator->errors()->first()], 403);
         }
 
-        $checkProgram = Program::find($request->program_id);
-
-        if (!$checkProgram) return response([
-            'status' => 401,
-            'success' => 'danger',
-            'message' => 'Không tìm thấy chương trình!'
-        ], 401);
-
-        $slug = SlugService::createSlug(Subject::class, 'slug', $request->name);
-        $uuid = substr(Str::uuid()->toString(), 0, 8);
-
-        $data = Subject::create([
-            'program_id' => $request->program_id,
-            'name' => $request->name,
-            'description' => $request->description,
-            'image' => $request->image,
-            'price' => $request->price,
-            'slug' => $slug . '-' . $uuid,
+        $data = Room::create([
+            'room' => $request->room,
+            'address' => $request->address,
         ]);
 
         if ($data) {
-            $data['program'] = Subject::find($data->id)->programs; 
-
             $response = [
                 'status' => 201,
                 'success' => 'success',
@@ -85,26 +62,23 @@ class SubjectController extends Controller
         ], 401);
     }
 
-    public function update(Subject $slug, Request $request) {
+    public function update($idRoom, Request $request) {
 
         if (Gate::denies('role-admin')) return response(['message' => 'Xin lỗi! Bạn không có quyền thực hiện.'], 401);
 
         $validator = Validator::make(
             $request->all(),
             [
-                'program_id' => 'required',
-                'name' => 'required|string',
-                'price' => 'decimal',
+                'room' => 'required|string',
+                'address' => 'required|string',
             ],
             [
                 'required' => ':attribute không được để trống',
                 'string' => ':attribute phải là một chuỗi',
-                'decimal' => ':attribute phải là một số',
             ],
             [
-                'program_id' => 'Chương trình',
-                'name' => 'Tên môn học',
-                'price' => 'Giá',
+                'room' => 'Tên / Mã phòng',
+                'address' => 'Địa chỉ',
             ]
         );
 
@@ -112,30 +86,25 @@ class SubjectController extends Controller
             return response(['status' => 403, 'success' => 'danger', 'message' => $validator->errors()->first()], 403);
         }
 
-        $checkProgram = Program::find($request->program_id);
+        $checkRoom = Room::find($idRoom);
 
-        if (!$checkProgram) return response([
+        if (!$checkRoom) return response([
             'status' => 401,
             'success' => 'danger',
-            'message' => 'Không tìm thấy chương trình!'
+            'message' => 'Không tìm thấy phòng!'
         ], 401);
 
-        $updated = $slug->update([
-            'program_id' => $request->program_id,
-            'name' => $request->name,
-            'description' => $request->description,
-            'image' => $request->image,
-            'price' => $request->price,
-        ]); 
+        $updated = $checkRoom->update([
+            'room' => $request->room,
+            'address' => $request->address,
+        ]);
 
         if ($updated) {
-            $slug['program'] = Subject::find($slug->id)->programs; 
-
             $response = [
-                'status' => 200,
+                'status' => 201,
                 'success' => 'success',
                 'message' => 'Cập nhật thành công!',
-                'data' => $slug
+                'data' => $checkRoom
             ];
     
             return response($response, 201);
@@ -149,10 +118,18 @@ class SubjectController extends Controller
         ], 401);
     }
 
-    public function destroy(Subject $slug) {
+    public function destroy($idRoom) {
         if (Gate::denies('role-admin')) return response(['message' => 'Xin lỗi! Bạn không có quyền thực hiện.'], 401);
 
-        $deleted = $slug->destroy($slug->id);
+        $room = Room::find($idRoom);
+
+        if (!$room) return response([
+            'status' => 401,
+            'success' => 'danger',
+            'message' => 'Không tìm thấy phòng!'
+        ], 401);
+
+        $deleted = $room->destroy($idRoom);
 
         if ($deleted) {
             $response = [

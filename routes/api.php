@@ -1,8 +1,14 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\TrainingProgramController;
+use App\Http\Controllers\Api\ProgramController;
+use App\Http\Controllers\Api\SubjectController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\RoomController;
+use App\Http\Controllers\Api\TeacherController;
+use App\Http\Controllers\Api\TimeFrameController;
+use App\Http\Controllers\Api\WeekDayController;
+use App\Http\Controllers\Api\CourseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,10 +20,41 @@ Route::group(['prefix' => '/auth'], function() {
     Route::post('/login', [AuthController::class, 'login']);
 });
 
-// TrainingProgram
-Route::group(['prefix' => '/training-programs'], function () { 
-    Route::get('/', [TrainingProgramController::class, 'show']);
+// Programs
+Route::group(['prefix' => '/programs'], function () { 
+    Route::get('/', [ProgramController::class, 'show']);
 });
+
+// Subjects
+Route::group(['prefix' => '/subjects'], function () { 
+    Route::get('/', [SubjectController::class, 'show']);
+});
+
+// Rooms
+Route::group(['prefix' => '/rooms'], function () { 
+    Route::get('/', [RoomController::class, 'show']);
+});
+
+// Teachers
+Route::group(['prefix' => '/teachers'], function () { 
+    Route::get('/', [TeacherController::class, 'show']);
+});
+
+// Time frames
+Route::group(['prefix' => '/time-frames'], function () { 
+    Route::get('/', [TimeFrameController::class, 'show']);
+});
+
+// Week days
+Route::group(['prefix' => '/week-days'], function () { 
+    Route::get('/', [WeekDayController::class, 'show']);
+});
+
+// Courses
+Route::group(['prefix' => '/courses'], function () { 
+    Route::get('/', [CourseController::class, 'show']);
+});
+
 
 
 // ================================================================
@@ -35,8 +72,52 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     
     // User
 
-    // TrainingProgram
-    Route::group(['prefix' => '/training-programs'], function () { 
-        Route::post('/', [TrainingProgramController::class, 'store']);
+    // Programs
+    Route::group(['prefix' => '/programs'], function () { 
+        Route::post('/', [ProgramController::class, 'store']);
+        Route::put('/{slug}', [ProgramController::class, 'update']);
+        Route::delete('/{slug}', [ProgramController::class, 'destroy']);
+    });
+
+    // Subjects
+    Route::group(['prefix' => '/subjects'], function () { 
+        Route::post('/', [SubjectController::class, 'store']);
+        Route::put('/{slug}', [SubjectController::class, 'update']);
+        Route::delete('/{slug}', [SubjectController::class, 'destroy']);
+    });
+
+    // Rooms
+    Route::group(['prefix' => '/rooms'], function () { 
+        Route::post('/', [RoomController::class, 'store']);
+        Route::put('/{idRoom}', [RoomController::class, 'update']);
+        Route::delete('/{idRoom}', [RoomController::class, 'destroy']);
+    });
+
+    // Teachers
+    Route::group(['prefix' => '/teachers'], function () { 
+        Route::post('/', [TeacherController::class, 'store']);
+        Route::put('/{idTeacher}', [TeacherController::class, 'update']);
+        Route::delete('/{idTeacher}', [TeacherController::class, 'destroy']);
+    });
+
+    // Time frames
+    Route::group(['prefix' => '/time-frames'], function () { 
+        Route::post('/', [TimeFrameController::class, 'store']);
+        Route::put('/{idTimeFrame}', [TimeFrameController::class, 'update']);
+        Route::delete('/{idTimeFrame}', [TimeFrameController::class, 'destroy']);
+    });
+
+    // Week days
+    Route::group(['prefix' => '/week-days'], function () { 
+        Route::post('/', [WeekDayController::class, 'store']);
+        Route::put('/{idWeedDay}', [WeekDayController::class, 'update']);
+        Route::delete('/{idWeedDay}', [WeekDayController::class, 'destroy']);
+    });
+
+    // Courses
+    Route::group(['prefix' => '/courses'], function () { 
+        Route::post('/', [CourseController::class, 'store']);
+        Route::put('/{slug}', [CourseController::class, 'update']);
+        Route::delete('/{slug}', [CourseController::class, 'destroy']);
     });
 });
