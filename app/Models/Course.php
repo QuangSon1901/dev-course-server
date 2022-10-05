@@ -15,17 +15,29 @@ class Course extends Model
 
     protected $fillable = [
         'name',
-        'quantity_minimum',
-        'quantity_maxnimum',
+        'description',
+        'image',
+        'price',
+        'program_id',
         'slug',
-        'subject_id',
-        'room_id',
-        'teacher_id',
-        'time_frame_id',
-        'week_day_id',
         'create_at',
         'update_at',
     ];
+
+    public function programs()
+    {
+        return $this->belongsTo(Program::class, 'program_id');
+    }
+
+    public function class_rooms()
+    {
+        return $this->hasMany(ClassRoom::class);
+    }
+
+    public function subjects()
+    {
+        return $this->hasMany(Subject::class);
+    }
 
     public function sluggable()
     {
@@ -39,30 +51,5 @@ class Course extends Model
     public function getRouteKeyName()
     {
         return 'slug';
-    }
-
-    public function rooms()
-    {
-        return $this->belongsTo(Room::class, 'room_id');
-    }
-
-    public function subjects()
-    {
-        return $this->belongsTo(Subject::class, 'subject_id');
-    }
-
-    public function teachers()
-    {
-        return $this->belongsTo(Teacher::class, 'teacher_id');
-    }
-
-    public function time_frames()
-    {
-        return $this->belongsTo(TimeFrame::class, 'time_frame_id');
-    }
-
-    public function week_days()
-    {
-        return $this->belongsTo(WeekDay::class, 'week_day_id');
     }
 }

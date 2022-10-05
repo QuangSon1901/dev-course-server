@@ -37,4 +37,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Role::class, 'role_id');
     }
+
+    public function class_rooms()
+    {
+        return $this->belongsToMany(ClassRoom::class, 'classes_users', 'user_id', 'class_id')->withPivot('date','money');
+    }
 }

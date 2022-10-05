@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Course;
 use App\Models\Program;
 use App\Models\Subject;
 use App\Models\Teacher;
@@ -31,19 +32,19 @@ class SearchController extends Controller
             return response(['status' => 403, 'success' => 'danger', 'message' => $validator->errors()->first()], 403);
         }
 
-        $subjects = Subject::where('name', 'LIKE', '%' . $request->q . '%')->take(3)->get();
+        $courses = Course::where('name', 'LIKE', '%' . $request->q . '%')->take(3)->get();
         $programs = Program::where('name', 'LIKE', '%' . $request->q . '%')->take(3)->get();
         $teachers = Teacher::where('name', 'LIKE', '%' . $request->q . '%')->take(3)->get();
 
         $response = [
             'status' => 200,
             'success' => 'success',
-            'subjects' => $subjects,
+            'courses' => $courses,
             'programs' => $programs,
             'teachers' => $teachers
         ];
 
-        $response['subjects_total'] = count($subjects);
+        $response['courses_total'] = count($courses);
         $response['programs_total'] = count($programs);
         $response['teachers_total'] = count($teachers);
 

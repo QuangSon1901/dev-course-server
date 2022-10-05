@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Cviebrock\EloquentSluggable\Sluggable;
 
 class Subject extends Model
 {
@@ -17,21 +17,15 @@ class Subject extends Model
         'name',
         'description',
         'image',
-        'price',
-        'program_id',
+        'course_id',
         'slug',
         'create_at',
         'update_at',
     ];
 
-    public function programs()
-    {
-        return $this->belongsTo(Program::class, 'program_id');
-    }
-
     public function courses()
     {
-        return $this->hasMany(Courses::class);
+        return $this->belongsTo(Course::class, 'course_id');
     }
 
     public function sluggable()

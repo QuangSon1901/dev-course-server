@@ -22,9 +22,9 @@ class Program extends Model
         'update_at',
     ];
 
-    public function subjects()
+    public function courses()
     {
-        return $this->hasMany(Subject::class);
+        return $this->hasMany(Course::class);
     }
 
     public function sluggable()

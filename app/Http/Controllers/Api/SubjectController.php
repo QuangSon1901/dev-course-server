@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Course;
 use App\Models\Program;
 use App\Models\Subject;
 use Illuminate\Http\Request;
@@ -17,14 +18,14 @@ class SubjectController extends Controller
         return Subject::all();
     }
 
-    public function store(Subject $slug, Request $request) {
+    public function store(Request $request) {
 
         if (Gate::denies('role-admin')) return response(['message' => 'Xin lỗi! Bạn không có quyền thực hiện.'], 401);
 
         $validator = Validator::make(
             $request->all(),
             [
-                'program_id' => 'required',
+                'course_id' => 'required',
                 'name' => 'required|string',
                 'price' => 'decimal',
             ],
@@ -34,7 +35,7 @@ class SubjectController extends Controller
                 'decimal' => ':attribute phải là một số',
             ],
             [
-                'program_id' => 'Chương trình',
+                'course_id' => 'Chương trình',
                 'name' => 'Tên môn học',
                 'price' => 'Giá',
             ]
@@ -44,19 +45,19 @@ class SubjectController extends Controller
             return response(['status' => 403, 'success' => 'danger', 'message' => $validator->errors()->first()], 403);
         }
 
-        $checkProgram = Program::find($request->program_id);
+        $checkCourse = Course::find($request->course_id);
 
-        if (!$checkProgram) return response([
+        if (!$checkCourse) return response([
             'status' => 401,
             'success' => 'danger',
-            'message' => 'Không tìm thấy chương trình!'
+            'message' => 'Không tìm thấy khoá học!'
         ], 401);
 
         $slug = SlugService::createSlug(Subject::class, 'slug', $request->name);
         $uuid = substr(Str::uuid()->toString(), 0, 8);
 
         $data = Subject::create([
-            'program_id' => $request->program_id,
+            'course_id' => $request->course_id,
             'name' => $request->name,
             'description' => $request->description,
             'image' => $request->image,
@@ -65,7 +66,7 @@ class SubjectController extends Controller
         ]);
 
         if ($data) {
-            $data['program'] = Subject::find($data->id)->programs; 
+            $data['courses'] = $data->courses; 
 
             $response = [
                 'status' => 201,
@@ -92,7 +93,7 @@ class SubjectController extends Controller
         $validator = Validator::make(
             $request->all(),
             [
-                'program_id' => 'required',
+                'course_id' => 'required',
                 'name' => 'required|string',
                 'price' => 'decimal',
             ],
@@ -102,7 +103,7 @@ class SubjectController extends Controller
                 'decimal' => ':attribute phải là một số',
             ],
             [
-                'program_id' => 'Chương trình',
+                'course_id' => 'Chương trình',
                 'name' => 'Tên môn học',
                 'price' => 'Giá',
             ]
@@ -112,16 +113,16 @@ class SubjectController extends Controller
             return response(['status' => 403, 'success' => 'danger', 'message' => $validator->errors()->first()], 403);
         }
 
-        $checkProgram = Program::find($request->program_id);
+        $checkCourse = Course::find($request->course_id);
 
-        if (!$checkProgram) return response([
+        if (!$checkCourse) return response([
             'status' => 401,
             'success' => 'danger',
-            'message' => 'Không tìm thấy chương trình!'
+            'message' => 'Không tìm thấy khoá học!'
         ], 401);
 
         $updated = $slug->update([
-            'program_id' => $request->program_id,
+            'course_id' => $request->course_id,
             'name' => $request->name,
             'description' => $request->description,
             'image' => $request->image,
@@ -129,7 +130,7 @@ class SubjectController extends Controller
         ]); 
 
         if ($updated) {
-            $slug['program'] = Subject::find($slug->id)->programs; 
+            $slug['courses'] = $slug->courses; 
 
             $response = [
                 'status' => 200,

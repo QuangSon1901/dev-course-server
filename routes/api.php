@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ClassRoomController;
+use App\Http\Controllers\Api\ClassUserController;
 use App\Http\Controllers\Api\ProgramController;
 use App\Http\Controllers\Api\SubjectController;
 use App\Http\Controllers\Api\UserController;
@@ -16,46 +18,51 @@ use Illuminate\Support\Facades\Route;
 // Public router
 
 // Auth
-Route::group(['prefix' => '/auth'], function() {
+Route::group(['prefix' => '/auth'], function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
 });
 
-// Search programs - subjects - teachers
+// Search programs - courses - teachers
 Route::get('/search', [SearchController::class, 'search']);
 
 // Programs
-Route::group(['prefix' => '/programs'], function () { 
+Route::group(['prefix' => '/programs'], function () {
     Route::get('/', [ProgramController::class, 'show']);
 });
 
 // Subjects
-Route::group(['prefix' => '/subjects'], function () { 
+Route::group(['prefix' => '/subjects'], function () {
     Route::get('/', [SubjectController::class, 'show']);
 });
 
 // Rooms
-Route::group(['prefix' => '/rooms'], function () { 
+Route::group(['prefix' => '/rooms'], function () {
     Route::get('/', [RoomController::class, 'show']);
 });
 
 // Teachers
-Route::group(['prefix' => '/teachers'], function () { 
+Route::group(['prefix' => '/teachers'], function () {
     Route::get('/', [TeacherController::class, 'show']);
 });
 
 // Time frames
-Route::group(['prefix' => '/time-frames'], function () { 
+Route::group(['prefix' => '/time-frames'], function () {
     Route::get('/', [TimeFrameController::class, 'show']);
 });
 
 // Week days
-Route::group(['prefix' => '/week-days'], function () { 
+Route::group(['prefix' => '/week-days'], function () {
     Route::get('/', [WeekDayController::class, 'show']);
 });
 
+// Class
+Route::group(['prefix' => '/classes'], function () {
+    Route::get('/', [ClassRoomController::class, 'show']);
+});
+
 // Courses
-Route::group(['prefix' => '/courses'], function () { 
+Route::group(['prefix' => '/courses'], function () {
     Route::get('/', [CourseController::class, 'show']);
 });
 
@@ -69,59 +76,69 @@ Route::group(['prefix' => '/courses'], function () {
 Route::group(['middleware' => ['auth:sanctum']], function () {
 
     // Auth
-    Route::group(['prefix' => '/auth'], function() {
+    Route::group(['prefix' => '/auth'], function () {
         Route::get('/', [UserController::class, 'getUser']);
         Route::post('/logout', [AuthController::class, 'logout']);
     });
-    
-    // User
 
     // Programs
-    Route::group(['prefix' => '/programs'], function () { 
+    Route::group(['prefix' => '/programs'], function () {
         Route::post('/', [ProgramController::class, 'store']);
         Route::put('/{slug}', [ProgramController::class, 'update']);
         Route::delete('/{slug}', [ProgramController::class, 'destroy']);
     });
 
     // Subjects
-    Route::group(['prefix' => '/subjects'], function () { 
+    Route::group(['prefix' => '/subjects'], function () {
         Route::post('/', [SubjectController::class, 'store']);
         Route::put('/{slug}', [SubjectController::class, 'update']);
         Route::delete('/{slug}', [SubjectController::class, 'destroy']);
     });
 
     // Rooms
-    Route::group(['prefix' => '/rooms'], function () { 
+    Route::group(['prefix' => '/rooms'], function () {
         Route::post('/', [RoomController::class, 'store']);
         Route::put('/{idRoom}', [RoomController::class, 'update']);
         Route::delete('/{idRoom}', [RoomController::class, 'destroy']);
     });
 
     // Teachers
-    Route::group(['prefix' => '/teachers'], function () { 
+    Route::group(['prefix' => '/teachers'], function () {
         Route::post('/', [TeacherController::class, 'store']);
         Route::put('/{idTeacher}', [TeacherController::class, 'update']);
         Route::delete('/{idTeacher}', [TeacherController::class, 'destroy']);
     });
 
     // Time frames
-    Route::group(['prefix' => '/time-frames'], function () { 
+    Route::group(['prefix' => '/time-frames'], function () {
         Route::post('/', [TimeFrameController::class, 'store']);
         Route::put('/{idTimeFrame}', [TimeFrameController::class, 'update']);
         Route::delete('/{idTimeFrame}', [TimeFrameController::class, 'destroy']);
     });
 
     // Week days
-    Route::group(['prefix' => '/week-days'], function () { 
+    Route::group(['prefix' => '/week-days'], function () {
         Route::post('/', [WeekDayController::class, 'store']);
         Route::put('/{idWeedDay}', [WeekDayController::class, 'update']);
         Route::delete('/{idWeedDay}', [WeekDayController::class, 'destroy']);
     });
 
+    // Classes
+    Route::group(['prefix' => '/classes'], function () {
+        Route::post('/', [ClassRoomController::class, 'store']);
+        Route::put('/{slug}', [ClassRoomController::class, 'update']);
+        Route::delete('/{slug}', [ClassRoomController::class, 'destroy']);
+    });
+
     // Courses
-    Route::group(['prefix' => '/courses'], function () { 
+    Route::group(['prefix' => '/courses'], function () {
         Route::post('/', [CourseController::class, 'store']);
         Route::put('/{slug}', [CourseController::class, 'update']);
         Route::delete('/{slug}', [CourseController::class, 'destroy']);
+    });
+
+    // Courses
+    Route::group(['prefix' => '/order'], function () {
+        Route::get('/', [ClassUserController::class, 'show']);
     });
 });

@@ -18,8 +18,8 @@ class TimeFrame extends Model
         'update_at',
     ];
 
-    public function courses()
+    public function class_rooms()
     {
-        return $this->hasMany(Courses::class);
+        return $this->hasMany(ClassRoom::class);
     }
 }

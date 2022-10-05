@@ -102,7 +102,7 @@ class AuthController extends Controller
         $token = $checkUser->createToken('usertoken')->plainTextToken;
 
         $response = [
-            'status' => 200,
+            'status' => 201,
             'success' => 'success',
             'message' => 'Đăng nhập thành công!',
             'user' => $checkUser,
