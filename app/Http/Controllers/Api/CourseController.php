@@ -26,12 +26,12 @@ class CourseController extends Controller
             [
                 'program_id' => 'required',
                 'name' => 'required|string',
-                'price' => 'decimal',
+                'price' => 'numeric',
             ],
             [
                 'required' => ':attribute không được để trống',
                 'string' => ':attribute phải là một chuỗi',
-                'decimal' => ':attribute phải là một số',
+                'numeric' => ':attribute phải là một số',
             ],
             [
                 'program_id' => 'Chương trình',

@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\TeacherController;
 use App\Http\Controllers\Api\TimeFrameController;
 use App\Http\Controllers\Api\WeekDayController;
 use App\Http\Controllers\Api\CourseController;
+use App\Http\Controllers\Api\ImageController;
 use App\Http\Controllers\Api\SearchController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -66,6 +67,8 @@ Route::group(['prefix' => '/courses'], function () {
     Route::get('/', [CourseController::class, 'show']);
 });
 
+Route::get('images', [ImageController::class, 'index'])->name('images');
+Route::post('images', [ImageController::class, 'upload'])->name('images');
 
 
 // ================================================================
