@@ -15,8 +15,15 @@ class ClassesUsers extends Model
         'user_id',
         'class_id',
         'date',
-        'money',
+        'price',
+        'status',
+        'certificate_id',
         'create_at',
         'update_at',
     ];
+
+    public function certificates()
+    {
+        return $this->belongsTo(Certificate::class, 'certificate_id');
+    }
 }

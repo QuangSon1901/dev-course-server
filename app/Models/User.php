@@ -40,6 +40,6 @@ class User extends Authenticatable
 
     public function class_rooms()
     {
-        return $this->belongsToMany(ClassRoom::class, 'classes_users', 'user_id', 'class_id')->withPivot('date','money');
+        return $this->belongsToMany(ClassRoom::class, 'classes_users', 'user_id', 'class_id')->withPivot('date','price','status', 'certificate_id');
     }
 }

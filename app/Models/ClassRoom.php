@@ -17,6 +17,8 @@ class ClassRoom extends Model
         'name',
         'quantity_minimum',
         'quantity_maxnimum',
+        'opening_day',
+        'status',
         'slug',
         'course_id',
         'room_id',
@@ -68,6 +70,6 @@ class ClassRoom extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'classes_users', 'class_id', 'user_id')->withPivot('date','money');
+        return $this->belongsToMany(User::class, 'classes_users', 'class_id', 'user_id')->withPivot('date','price','status', 'certificate_id');
     }
 }
