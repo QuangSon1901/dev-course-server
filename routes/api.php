@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\TimeFrameController;
 use App\Http\Controllers\Api\WeekDayController;
 use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\ImageController;
+use App\Http\Controllers\Api\ResetPasswordController;
 use App\Http\Controllers\Api\SearchController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +23,9 @@ use Illuminate\Support\Facades\Route;
 Route::group(['prefix' => '/auth'], function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
+
+    Route::post('reset-password', [ResetPasswordController::class, 'sendMail']);
+    Route::put('reset-password/{token}', [ResetPasswordController::class, 'reset']);
 });
 
 // Search programs - courses - teachers
