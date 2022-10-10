@@ -12,7 +12,20 @@ use Illuminate\Support\Str;
 
 class ProgramController extends Controller
 {
-    public function show() {
+    public function show(Request $request) {
+        if ($request->type == "less")
+        {
+            $program = Program::take(5)->get();
+            foreach($program as $item) {
+                $item['courses'] = $item->courses;
+            }
+            
+            $response = [
+                'program' => $program
+            ];
+    
+            return response($response, 201);
+        }
         return Program::all();
     }
 
