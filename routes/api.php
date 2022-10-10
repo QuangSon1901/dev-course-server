@@ -71,8 +71,8 @@ Route::group(['prefix' => '/courses'], function () {
     Route::get('/', [CourseController::class, 'show']);
 });
 
-Route::get('images', [ImageController::class, 'index'])->name('images');
-Route::post('images', [ImageController::class, 'upload'])->name('images');
+// Route::get('images', [ImageController::class, 'index'])->name('images');
+// Route::post('images', [ImageController::class, 'upload'])->name('images');
 
 
 // ================================================================

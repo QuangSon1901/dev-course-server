@@ -3,13 +3,17 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Mail\MailSend;
 use App\Models\PasswordReset;
 use App\Models\User;
 use App\Notifications\ResetPasswordRequest;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Exception;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+
 class ResetPasswordController extends Controller
 {
     public function sendMail(Request $request)
