@@ -3,14 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Mail\MailSend;
 use App\Models\PasswordReset;
 use App\Models\User;
 use App\Notifications\ResetPasswordRequest;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-use Exception;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -83,7 +80,11 @@ class ResetPasswordController extends Controller
 
         $passwordReset = PasswordReset::where('token', $token)->first();
 
-        if (Carbon::parse($passwordReset->updated_at)->addMinutes(720)->isPast()) {
+        if (!$passwordReset) {
+            return response(['status' => 422, 'success' => 'danger', 'message' => 'Mã thông báo đặt lại mật khẩu này không hợp lệ.'], 422);
+        }
+        
+        if (Carbon::parse($passwordReset['updated_at'])->addMinutes(720)->isPast()) {
             $passwordReset->delete();
 
             return response()->json([
@@ -93,7 +94,9 @@ class ResetPasswordController extends Controller
 
         $user = User::where('email', $passwordReset->email)->firstOrFail();
 
-        $updatePasswordUser = $user->update(bcrypt($request->password));
+        $updatePasswordUser = $user->update([
+            'password' => bcrypt($request->password)
+        ]);
         $passwordReset->delete();
 
         if ($updatePasswordUser) {
