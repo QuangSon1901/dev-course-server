@@ -48,14 +48,14 @@ class ResetPasswordController extends Controller
         ]);
 
         if ($passwordReset) {
-            $user->notify(new ResetPasswordRequest($passwordReset->token));
-        }
-
-        return response([
+            return response([
             'status' => 201,
             'success' => 'success',
             'message' => 'Chúng tôi đã gửi qua e-mail liên kết đặt lại mật khẩu của bạn!'
         ], 201);
+        }
+
+        
     }
 
     public function reset(Request $request, $token)

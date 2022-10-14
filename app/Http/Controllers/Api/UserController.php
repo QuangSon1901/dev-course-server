@@ -13,6 +13,7 @@ class UserController extends Controller
 
         $response = [
             'status' => 201,
+            'success' => 'success',
             'user' => $user,
         ];
 
