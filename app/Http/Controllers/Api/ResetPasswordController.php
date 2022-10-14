@@ -22,6 +22,7 @@ class ResetPasswordController extends Controller
             ],
             [
                 'required' => ':attribute không được để trống',
+                'email' => ':attribute sai định dạng',
             ],
             [
                 'email' => 'Email',
