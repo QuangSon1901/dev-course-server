@@ -33,19 +33,19 @@ class SearchController extends Controller
         }
 
         $courses = Course::where('name', 'LIKE', '%' . $request->q . '%')->take(3)->get();
-        $programs = Program::where('name', 'LIKE', '%' . $request->q . '%')->take(3)->get();
+        $subjects = Subject::where('name', 'LIKE', '%' . $request->q . '%')->take(3)->get();
         $teachers = Teacher::where('name', 'LIKE', '%' . $request->q . '%')->take(3)->get();
 
         $response = [
             'status' => 200,
             'success' => 'success',
             'courses' => $courses,
-            'programs' => $programs,
+            'subjects' => $subjects,
             'teachers' => $teachers
         ];
 
         $response['courses_total'] = count($courses);
-        $response['programs_total'] = count($programs);
+        $response['subjects_total'] = count($subjects);
         $response['teachers_total'] = count($teachers);
 
         return response($response, 200);

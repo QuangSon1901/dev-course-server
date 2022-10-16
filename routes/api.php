@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CategoryCourseController;
 use App\Http\Controllers\Api\ClassRoomController;
 use App\Http\Controllers\Api\ClassUserController;
 use App\Http\Controllers\Api\ProgramController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\ImageController;
 use App\Http\Controllers\Api\ResetPasswordController;
 use App\Http\Controllers\Api\SearchController;
+use App\Http\Controllers\Api\TopicCourseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -93,6 +95,16 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/', [ProgramController::class, 'store']);
         Route::put('/{slug}', [ProgramController::class, 'update']);
         Route::delete('/{slug}', [ProgramController::class, 'destroy']);
+    });
+
+    // Categories Courses
+    Route::group(['prefix' => '/category-course'], function () {
+        Route::post('/', [CategoryCourseController::class, 'store']);
+    });
+
+    // Topics Courses
+    Route::group(['prefix' => '/topic-course'], function () {
+        Route::post('/', [TopicCourseController::class, 'store']);
     });
 
     // Subjects

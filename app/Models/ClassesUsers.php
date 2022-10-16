@@ -26,4 +26,14 @@ class ClassesUsers extends Model
     {
         return $this->belongsTo(Certificate::class, 'certificate_id');
     }
+
+    public function users()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function class_rooms()
+    {
+        return $this->belongsTo(ClassRoom::class, 'class_id');
+    }
 }

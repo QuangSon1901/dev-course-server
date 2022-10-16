@@ -3,33 +3,17 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\CategoryCourse;
 use App\Models\Program;
 use App\Models\SearchKeyword;
+use Cviebrock\EloquentSluggable\Services\SlugService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
-use \Cviebrock\EloquentSluggable\Services\SlugService;
 use Illuminate\Support\Str;
 
-class ProgramController extends Controller
+class CategoryCourseController extends Controller
 {
-    public function show(Request $request)
-    {
-        if ($request->type == "less") {
-            $program = Program::take(5)->get();
-            foreach ($program as $item) {
-                $item['courses'] = $item->courses;
-            }
-
-            $response = [
-                'program' => $program
-            ];
-
-            return response($response, 201);
-        }
-        return Program::all();
-    }
-
     public function store(Request $request)
     {
 
@@ -41,6 +25,7 @@ class ProgramController extends Controller
                 'name' => 'required|string',
                 'description' => 'string',
                 'image' => 'image|mimes:jpg,png|max:2048',
+                'program_id' => 'required',
                 'keywords' => 'required|array|min:1',
                 "keywords.*"  => "required|string|distinct",
             ],
@@ -59,6 +44,7 @@ class ProgramController extends Controller
                 'description' => 'Mô tả chương trình',
                 'image' => 'Hình ảnh',
                 'keywords' => 'Từ khoá',
+                'program_id' => 'Chương trình đào tạo',
             ]
         );
 
@@ -66,7 +52,15 @@ class ProgramController extends Controller
             return response(['status' => 403, 'success' => 'danger', 'message' => $validator->errors()], 403);
         }
 
-        $slug = SlugService::createSlug(Program::class, 'slug', $request->name);
+        $checkProgram = Program::find($request->program_id);
+
+        if (!$checkProgram) return response([
+            'status' => 403,
+            'success' => 'danger',
+            'message' => 'Không tìm thấy dữ liệu!'
+        ], 403);
+
+        $slug = SlugService::createSlug(CategoryCourse::class, 'slug', $request->name);
         $uuid = substr(Str::uuid()->toString(), 0, 8);
 
         if ($request->has('image')) {
@@ -78,32 +72,34 @@ class ProgramController extends Controller
                 'description' => $request->description,
                 'image' => $filename,
                 'slug' => $slug . '-' . $uuid,
+                'program_id' => $request->program_id
             ];
         } else {
             $data = [
                 'name' => $request->name,
                 'description' => $request->description,
                 'slug' => $slug . '-' . $uuid,
+                'program_id' => $request->program_id
             ];
         }
 
-        $newProgram = Program::create($data);
+        $newCategoryCourse = CategoryCourse::create($data);
 
-        if ($newProgram) {
-            foreach($request->keywords as $value) {
+        if ($newCategoryCourse) {
+            foreach ($request->keywords as $value) {
                 SearchKeyword::create([
                     'keyword' => $value,
-                    'program_id' => $newProgram->id
+                    'category_course_id' => $newCategoryCourse->id
                 ]);
             }
 
-            $newProgram['search_keywords'] = $newProgram->search_keywords;
+            $newCategoryCourse['search_keywords'] = $newCategoryCourse->search_keywords;
 
             $response = [
                 'status' => 201,
                 'success' => 'success',
                 'message' => 'Thêm thành công!',
-                'data' => $newProgram,
+                'data' => $newCategoryCourse,
             ];
 
             return response($response, 201);
@@ -116,73 +112,5 @@ class ProgramController extends Controller
         ];
 
         return response($response, 403);
-    }
-
-    public function update(Program $slug, Request $request)
-    {
-        if (Gate::denies('role-admin')) return response(['message' => 'Xin lỗi! Bạn không có quyền thực hiện.'], 401);
-
-        $validator = Validator::make(
-            $request->all(),
-            [
-                'name' => 'required|string',
-            ],
-            [
-                'required' => ':attribute không được để trống',
-            ],
-            [
-                'name' => 'Tên chương trình',
-            ]
-        );
-
-        if ($validator->fails()) {
-            return response(['status' => 403, 'success' => 'danger', 'message' => $validator->errors()->first()], 403);
-        }
-
-        $updated = $slug->update([
-            'name' => $request->name,
-            'description' => $request->description,
-            'image' => $request->image,
-        ]);
-
-        if ($updated) {
-            $response = [
-                'status' => 201,
-                'success' => 'success',
-                'message' => 'Cập nhật thành công!',
-                'data' => $slug
-            ];
-
-            return response($response, 201);
-        }
-
-        return response([
-            'status' => 401,
-            'success' => 'danger',
-            'message' => 'Cập nhật thất bại!'
-        ], 401);
-    }
-
-    public function destroy(Program $slug)
-    {
-        if (Gate::denies('role-admin')) return response(['message' => 'Xin lỗi! Bạn không có quyền thực hiện.'], 401);
-
-        $deleted = $slug->destroy($slug->id);
-
-        if ($deleted) {
-            $response = [
-                'status' => 201,
-                'success' => 'success',
-                'message' => 'Xoá thành công!'
-            ];
-
-            return response($response, 201);
-        }
-
-        return response([
-            'status' => 401,
-            'success' => 'danger',
-            'message' => 'Xoá thất bại!'
-        ], 401);
     }
 }

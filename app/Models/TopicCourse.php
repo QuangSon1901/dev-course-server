@@ -6,12 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Cviebrock\EloquentSluggable\Sluggable;
 
-class Program extends Model
+class TopicCourse extends Model
 {
     use HasFactory;
     use Sluggable;
 
-    protected $table = 'programs';
+    protected $table = 'topic_courses';
 
     protected $fillable = [
         'name',
@@ -22,14 +22,19 @@ class Program extends Model
         'update_at',
     ];
 
-    public function category_courses()
+    public function courses()
     {
-        return $this->hasMany(CategoryCourse::class);
+        return $this->hasMany(Course::class);
     }
 
     public function search_keywords()
     {
         return $this->hasMany(SearchKeyword::class);
+    }
+
+    public function category_courses()
+    {
+        return $this->belongsToMany(CategoryCourse::class, 'category_topic_courses', 'topic_course_id', 'category_course_id');
     }
 
     public function sluggable()

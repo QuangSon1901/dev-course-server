@@ -43,4 +43,14 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(ClassRoom::class, 'classes_users', 'user_id', 'class_id')->withPivot('date','price','status', 'certificate_id');
     }
+
+    public function wish_courses()
+    {
+        return $this->belongsToMany(Course::class, 'wish_courses', 'user_id', 'course_id');
+    }
+
+    public function review_courses()
+    {
+        return $this->belongsToMany(Course::class, 'review_courses', 'user_id', 'course_id')->withPivot('comment','rating');
+    }
 }

@@ -15,18 +15,26 @@ class Course extends Model
 
     protected $fillable = [
         'name',
+        'sub_name',
+        'video_demo',
         'description',
         'image',
         'price',
-        'program_id',
         'slug',
+        'topic_course_id',
+        'search_keyword_id',
         'create_at',
         'update_at',
     ];
 
-    public function programs()
+    public function topic_courses()
     {
-        return $this->belongsTo(Program::class, 'program_id');
+        return $this->belongsTo(TopicCourse::class, 'topic_course_id');
+    }
+
+    public function search_keywords()
+    {
+        return $this->belongsTo(SearchKeyword::class, 'search_keyword_id');
     }
 
     public function class_rooms()
@@ -34,9 +42,19 @@ class Course extends Model
         return $this->hasMany(ClassRoom::class);
     }
 
-    public function subjects()
+    public function units()
     {
-        return $this->hasMany(Subject::class);
+        return $this->hasMany(Unit::class);
+    }
+
+    public function users_wish()
+    {
+        return $this->belongsToMany(User::class, 'wish_courses', 'course_id', 'user_id');
+    }
+
+    public function users_review()
+    {
+        return $this->belongsToMany(ReviewCourse::class, 'review_courses', 'course_id', 'user_id');
     }
 
     public function sluggable()
