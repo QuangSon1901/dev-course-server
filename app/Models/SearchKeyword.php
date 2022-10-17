@@ -23,7 +23,7 @@ class SearchKeyword extends Model
 
     public function courses()
     {
-        return $this->hasMany(Course::class);
+        return $this->belongsToMany(Course::class, 'search', 'search_keyword_id', 'course_id');
     }
 
     public function programs()

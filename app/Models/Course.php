@@ -22,19 +22,18 @@ class Course extends Model
         'price',
         'slug',
         'topic_course_id',
-        'search_keyword_id',
         'create_at',
         'update_at',
     ];
 
+    public function search_keywords()
+    {
+        return $this->belongsToMany(SearchKeyword::class, 'search', 'course_id', 'search_keyword_id');
+    }
+
     public function topic_courses()
     {
         return $this->belongsTo(TopicCourse::class, 'topic_course_id');
-    }
-
-    public function search_keywords()
-    {
-        return $this->belongsTo(SearchKeyword::class, 'search_keyword_id');
     }
 
     public function class_rooms()

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\Program;
+use App\Models\TopicCourse;
 use Cviebrock\EloquentSluggable\Services\SlugService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -24,19 +25,34 @@ class CourseController extends Controller
         $validator = Validator::make(
             $request->all(),
             [
-                'program_id' => 'required',
                 'name' => 'required|string',
+                'sub_name' => 'string',
+                'video_demo' => 'url',
+                'description' => 'string',
+                'image' => 'image|mimes:jpg,png|max:2048',
                 'price' => 'numeric',
+                'topic_course_id' => 'required',
             ],
             [
                 'required' => ':attribute không được để trống',
-                'string' => ':attribute phải là một chuỗi',
-                'numeric' => ':attribute phải là một số',
+                'string' => ':attribute phải là dạng chuỗi',
+                'numeric' => ':attribute phải là dạng numeric',
+                'url' => ':attribute phải là dạng url video (Youtube)',
+                'image' => ':attribute phải là dạng file hình ảnh',
+                'mimes' => ':attribute chỉ chấp nhận đuôi "jpg" or "png"',
+                'max' => ':attribute phải dưới 2048kb',
+                'array' => ':attribute là một danh sách',
+                'min' => ':attribute ít nhất 1',
+                'distinct' => ':attribute không được trùng lặp'
             ],
             [
-                'program_id' => 'Chương trình',
-                'name' => 'Tên môn học',
+                'name' => 'Tên chương trình',
+                'sub_name' => 'Tên phụ',
+                'description' => 'Mô tả chương trình',
+                'image' => 'Hình ảnh',
                 'price' => 'Giá',
+                'topic_course_id' => 'Chủ đề khoá học',
+                'video_demo' => 'Video demo'
             ]
         );
 
@@ -44,34 +60,53 @@ class CourseController extends Controller
             return response(['status' => 403, 'success' => 'danger', 'message' => $validator->errors()->first()], 403);
         }
 
-        $checkProgram = Program::find($request->program_id);
+        $checkTopic = TopicCourse::find($request->topic_course_id);
 
-        if (!$checkProgram) return response([
+        if (!$checkTopic) return response([
             'status' => 401,
             'success' => 'danger',
-            'message' => 'Không tìm thấy chương trình!'
+            'message' => 'Không tìm thấy chủ đề khoá học!'
         ], 401);
 
         $slug = SlugService::createSlug(Course::class, 'slug', $request->name);
         $uuid = substr(Str::uuid()->toString(), 0, 8);
 
-        $data = Course::create([
-            'program_id' => $request->program_id,
-            'name' => $request->name,
-            'description' => $request->description,
-            'image' => $request->image,
-            'price' => $request->price,
-            'slug' => $slug . '-' . $uuid,
-        ]);
+        if ($request->has('image')) {
+            $filename = time() . rand(1, 10) . '.' . $request->file('image')->getClientOriginalExtension();
+            $request->file('image')->move('uploads/', $filename);
 
-        if ($data) {
-            $data['programs'] = $data->programs; 
+            $data = [
+                'name' => $request->name,
+                'subname' => $request->subname,
+                'video_demo' => $request->video_demo,
+                'description' => $request->description,
+                'image' => $filename,
+                'price' => $request->price,
+                'topic_course_id' => $request->topic_course_id,
+                'slug' => $slug . '-' . $uuid,
+            ];
+        } else {
+            $data = [
+                'name' => $request->name,
+                'subname' => $request->subname,
+                'video_demo' => $request->video_demo,
+                'description' => $request->description,
+                'price' => $request->price,
+                'topic_course_id' => $request->topic_course_id,
+                'slug' => $slug . '-' . $uuid,
+            ];
+        }
+
+        $newCourse = Course::create($data);
+
+        if ($newCourse) {
+            $newCourse['topic_courses'] = $newCourse->topic_courses; 
 
             $response = [
                 'status' => 201,
                 'success' => 'success',
                 'message' => 'Thêm thành công!',
-                'data' => $data
+                'data' => $newCourse
             ];
     
             return response($response, 201);
