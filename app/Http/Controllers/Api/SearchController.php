@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\Program;
+use App\Models\SearchKeyword;
 use App\Models\Subject;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 
 class SearchController extends Controller
@@ -32,21 +34,16 @@ class SearchController extends Controller
             return response(['status' => 403, 'success' => 'danger', 'message' => $validator->errors()->first()], 403);
         }
 
-        $courses = Course::where('name', 'LIKE', '%' . $request->q . '%')->take(3)->get();
-        $subjects = Subject::where('name', 'LIKE', '%' . $request->q . '%')->take(3)->get();
-        $teachers = Teacher::where('name', 'LIKE', '%' . $request->q . '%')->take(3)->get();
-
+        $keyword = SearchKeyword::select('id', 'keyword')->where('keyword', 'LIKE', $request->q . '%')->take(8)->get();
+        $courses = Course::select('id','name', 'slug')->where('name', 'LIKE', $request->q . '%')->take(3)->get();
+        
+        $result = [...$keyword, ...$courses];
+        
         $response = [
             'status' => 200,
             'success' => 'success',
-            'courses' => $courses,
-            'subjects' => $subjects,
-            'teachers' => $teachers
+            'suggests' => $result,
         ];
-
-        $response['courses_total'] = count($courses);
-        $response['subjects_total'] = count($subjects);
-        $response['teachers_total'] = count($teachers);
 
         return response($response, 200);
     }

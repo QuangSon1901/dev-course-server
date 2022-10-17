@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryCourseController;
 use App\Http\Controllers\Api\ClassRoomController;
 use App\Http\Controllers\Api\ClassUserController;
+use App\Http\Controllers\Api\CombineController;
 use App\Http\Controllers\Api\ProgramController;
 use App\Http\Controllers\Api\SubjectController;
 use App\Http\Controllers\Api\UserController;
@@ -16,6 +17,7 @@ use App\Http\Controllers\Api\ImageController;
 use App\Http\Controllers\Api\ResetPasswordController;
 use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\TopicCourseController;
+use App\Models\CategoryCourse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -36,6 +38,17 @@ Route::get('/search', [SearchController::class, 'search']);
 // Programs
 Route::group(['prefix' => '/programs'], function () {
     Route::get('/', [ProgramController::class, 'show']);
+    Route::get('/{slug}', [ProgramController::class, 'showSlug']);
+});
+
+// Category Course
+Route::group(['prefix' => '/category-course'], function () {
+    Route::get('/{slug}', [CategoryCourseController::class, 'showSlug']);
+});
+
+// Topic Course
+Route::group(['prefix' => '/topic-course'], function () {
+    Route::get('/{slug}', [TopicCourseController::class, 'showSlug']);
 });
 
 // Subjects
@@ -71,6 +84,11 @@ Route::group(['prefix' => '/classes'], function () {
 // Courses
 Route::group(['prefix' => '/courses'], function () {
     Route::get('/', [CourseController::class, 'show']);
+});
+
+// Courses
+Route::group(['prefix' => '/combine'], function () {
+    Route::get('/', [CombineController::class, 'show']);
 });
 
 // Route::get('images', [ImageController::class, 'index'])->name('images');

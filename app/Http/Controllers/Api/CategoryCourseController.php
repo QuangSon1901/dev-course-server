@@ -14,6 +14,13 @@ use Illuminate\Support\Str;
 
 class CategoryCourseController extends Controller
 {
+    public function showSlug(CategoryCourse $slug, Request $request) {
+        $slug['search_keywords'] = $slug->search_keywords;
+        return response([
+            'category_course' => $slug,
+        ], 201);
+    }
+
     public function store(Request $request)
     {
 

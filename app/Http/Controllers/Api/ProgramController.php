@@ -30,6 +30,13 @@ class ProgramController extends Controller
         return Program::all();
     }
 
+    public function showSlug(Program $slug, Request $request) {
+        $slug['search_keywords'] = $slug->search_keywords;
+        return response([
+            'program' => $slug,
+        ], 201);
+    }
+
     public function store(Request $request)
     {
 

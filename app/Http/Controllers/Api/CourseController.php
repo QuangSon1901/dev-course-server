@@ -14,13 +14,17 @@ use Illuminate\Support\Str;
 
 class CourseController extends Controller
 {
-    public function show() {
+    public function show()
+    {
         return Course::all();
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
 
         if (Gate::denies('role-admin')) return response(['message' => 'Xin lỗi! Bạn không có quyền thực hiện.'], 401);
+
+        
 
         $validator = Validator::make(
             $request->all(),
@@ -55,6 +59,8 @@ class CourseController extends Controller
                 'video_demo' => 'Video demo'
             ]
         );
+
+        
 
         if ($validator->fails()) {
             return response(['status' => 403, 'success' => 'danger', 'message' => $validator->errors()->first()], 403);
@@ -100,6 +106,28 @@ class CourseController extends Controller
         $newCourse = Course::create($data);
 
         if ($newCourse) {
+
+            $search_keywords = array();
+            array_push($search_keywords, ...$checkTopic->search_keywords);
+    
+    
+            foreach ($checkTopic->category_courses as $category_course) {
+                array_push($search_keywords, ...$category_course->search_keywords);
+                $programs[$category_course->program_id] = $category_course->programs;
+            }
+    
+            foreach ($programs as $program) {
+                array_push($search_keywords, ...$program->search_keywords);
+            }
+            
+            foreach ($search_keywords as $key) {
+                $result[$key->id] = $key->id;
+            }
+
+            foreach ($result as $key => $value) {
+                $newCourse->search_keywords()->attach($value);
+            }
+
             $newCourse['topic_courses'] = $newCourse->topic_courses; 
 
             $response = [
@@ -108,7 +136,7 @@ class CourseController extends Controller
                 'message' => 'Thêm thành công!',
                 'data' => $newCourse
             ];
-    
+
             return response($response, 201);
         }
 
@@ -120,7 +148,8 @@ class CourseController extends Controller
         ], 401);
     }
 
-    public function update(Course $slug, Request $request) {
+    public function update(Course $slug, Request $request)
+    {
 
         if (Gate::denies('role-admin')) return response(['message' => 'Xin lỗi! Bạn không có quyền thực hiện.'], 401);
 
@@ -161,10 +190,10 @@ class CourseController extends Controller
             'description' => $request->description,
             'image' => $request->image,
             'price' => $request->price,
-        ]); 
+        ]);
 
         if ($updated) {
-            $slug['programs'] = $slug->programs; 
+            $slug['programs'] = $slug->programs;
 
             $response = [
                 'status' => 200,
@@ -172,7 +201,7 @@ class CourseController extends Controller
                 'message' => 'Cập nhật thành công!',
                 'data' => $slug
             ];
-    
+
             return response($response, 201);
         }
 
@@ -184,7 +213,8 @@ class CourseController extends Controller
         ], 401);
     }
 
-    public function destroy(Course $slug) {
+    public function destroy(Course $slug)
+    {
         if (Gate::denies('role-admin')) return response(['message' => 'Xin lỗi! Bạn không có quyền thực hiện.'], 401);
 
         $deleted = $slug->destroy($slug->id);
@@ -195,7 +225,7 @@ class CourseController extends Controller
                 'success' => 'success',
                 'message' => 'Xoá thành công!'
             ];
-    
+
             return response($response, 201);
         }
 

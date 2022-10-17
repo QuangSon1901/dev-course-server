@@ -38,6 +38,7 @@ class ClassRoomController extends Controller
                 'teacher_id' => 'required|integer',
                 'time_frame_id' => 'required|integer',
                 'week_day_id' => 'required|integer',
+                'week_day_id' => 'required|integer',
             ],
             [
                 'required' => ':attribute không được để trống',
