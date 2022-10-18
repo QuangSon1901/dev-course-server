@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 
 class ResetPasswordController extends Controller
 {
@@ -38,24 +39,25 @@ class ResetPasswordController extends Controller
         if (!$user) return response([
             'status' => 401,
             'success' => 'danger',
-            'message' => 'Email không tồn tại trên hệ thống!'
+            'message' => 'Email không tồn tại trên hệ thống!',
         ], 401);
+
+        $token = Str::random(60);
 
         $passwordReset = PasswordReset::updateOrCreate([
             'email' => $user->email,
         ], [
-            'token' => Str::random(60),
+            'token' => bcrypt($token),
         ]);
 
         if ($passwordReset) {
             return response([
-            'status' => 201,
-            'success' => 'success',
-            'message' => 'Chúng tôi đã gửi qua e-mail liên kết đặt lại mật khẩu của bạn!'
-        ], 201);
+                'status' => 201,
+                'success' => 'success',
+                'message' => 'Chúng tôi đã gửi qua e-mail liên kết đặt lại mật khẩu của bạn!',
+                'token' => $token
+            ], 201);
         }
-
-        
     }
 
     public function reset(Request $request, $token)
@@ -79,12 +81,14 @@ class ResetPasswordController extends Controller
             return response(['status' => 403, 'success' => 'danger', 'message' => $validator->errors()->first()], 403);
         }
 
-        $passwordReset = PasswordReset::where('token', $token)->first();
+        $passwordReset = PasswordReset::where('email', $request->email)->first();
 
-        if (!$passwordReset) {
-            return response(['status' => 422, 'success' => 'danger', 'message' => 'Mã thông báo đặt lại mật khẩu này không hợp lệ.'], 422);
-        }
-        
+        if (!$passwordReset || !Hash::check($token, $passwordReset->token)) return response([
+            'status' => 401,
+            'success' => 'danger',
+            'message' => 'Email hoặc Mã thông báo đặt lại mật khẩu này không hợp lệ.!'
+        ], 401);
+
         if (Carbon::parse($passwordReset['updated_at'])->addMinutes(720)->isPast()) {
             $passwordReset->delete();
 
