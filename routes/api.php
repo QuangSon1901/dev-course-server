@@ -34,6 +34,7 @@ Route::group(['prefix' => '/auth'], function () {
 
 // Search programs - courses - teachers
 Route::get('/search', [SearchController::class, 'search']);
+Route::get('/search-keyword', [SearchController::class, 'searchKeyword']);
 
 // Programs
 Route::group(['prefix' => '/programs'], function () {
