@@ -11,14 +11,14 @@ use Illuminate\Http\Request;
 
 class CombineController extends Controller
 {
-    public function show() {
+    public function show()
+    {
         $programs = Program::select('id', 'name', 'slug')->get();
         foreach ($programs as $item) {
             $item['category_courses'] = $item->category_courses;
         }
 
         $new_courses = Course::select('id', 'name', 'image', 'price', 'slug')->where('created_at', '>=', Carbon::now()->subMonth(1))->take(10)->get();
-
         $popular_reactjs = Course::select('id', 'name', 'image', 'price', 'slug')->where('topic_course_id', 2)->take(10)->get();
 
         $response = [
