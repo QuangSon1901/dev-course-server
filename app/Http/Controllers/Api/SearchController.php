@@ -76,7 +76,7 @@ class SearchController extends Controller
             }
         })
         ->orWhere('name', 'like', '%' . $request->q . '%')
-        ->paginate(10);
+        ->paginate(20);
 
         $response = [
             'status' => 200,

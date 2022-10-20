@@ -168,7 +168,7 @@ class CourseController extends Controller
             $info = pathinfo($item['image']);
             $filename = time() . rand(1, 10) . $info['basename'];
 
-            $img = public_path('uploads') . '\\' . $filename;
+            $img = public_path('uploads/') . $filename;
             file_put_contents($img, file_get_contents($item['image']));
 
             $data = [
