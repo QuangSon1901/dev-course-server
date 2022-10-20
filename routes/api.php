@@ -171,11 +171,12 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     // Courses
     Route::group(['prefix' => '/courses'], function () {
         Route::post('/', [CourseController::class, 'store']);
+        Route::post('/store_auto', [CourseController::class, 'store_auto']);
         Route::put('/{slug}', [CourseController::class, 'update']);
         Route::delete('/{slug}', [CourseController::class, 'destroy']);
     });
 
-    // Courses
+    // order
     Route::group(['prefix' => '/order'], function () {
         Route::get('/', [ClassUserController::class, 'show']);
     });

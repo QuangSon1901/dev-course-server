@@ -83,7 +83,7 @@ class CourseController extends Controller
 
             $data = [
                 'name' => $request->name,
-                'subname' => $request->subname,
+                'sub_name' => $request->sub_name,
                 'video_demo' => $request->video_demo,
                 'description' => $request->description,
                 'image' => $filename,
@@ -94,7 +94,7 @@ class CourseController extends Controller
         } else {
             $data = [
                 'name' => $request->name,
-                'subname' => $request->subname,
+                'sub_name' => $request->sub_name,
                 'video_demo' => $request->video_demo,
                 'description' => $request->description,
                 'price' => $request->price,
@@ -146,6 +146,68 @@ class CourseController extends Controller
             'success' => 'danger',
             'message' => 'Thêm thất bại!'
         ], 401);
+    }
+
+    public function store_auto(Request $request)
+    {
+        if (Gate::denies('role-admin')) return response(['message' => 'Xin lỗi! Bạn không có quyền thực hiện.'], 401);
+
+        $checkTopic = TopicCourse::find($request->topic_course_id);
+
+        if (!$checkTopic) return response([
+            'status' => 401,
+            'success' => 'danger',
+            'message' => 'Không tìm thấy chủ đề khoá học!'
+        ], 401);
+
+        $data = json_decode($request->data_json, true);
+        foreach ($data as $item) {
+            $slug = SlugService::createSlug(Course::class, 'slug', $item['name']);
+            $uuid = substr(Str::uuid()->toString(), 0, 8);
+
+            $info = pathinfo($item['image']);
+            $filename = time() . rand(1, 10) . $info['basename'];
+
+            $img = public_path('uploads') . '\\' . $filename;
+            file_put_contents($img, file_get_contents($item['image']));
+
+            $data = [
+                'name' => $item['name'],
+                'sub_name' => $item['sub_name'],
+                'image' => $filename,
+                'price' => $item['price'],
+                'topic_course_id' => $request->topic_course_id,
+                'slug' => $slug . '-' . $uuid,
+            ];
+
+            $newCourse = Course::create($data);
+
+            if ($newCourse) {
+
+                $search_keywords = array();
+                array_push($search_keywords, ...$checkTopic->search_keywords);
+
+
+                foreach ($checkTopic->category_courses as $category_course) {
+                    array_push($search_keywords, ...$category_course->search_keywords);
+                    $programs[$category_course->program_id] = $category_course->programs;
+                }
+
+                foreach ($programs as $program) {
+                    array_push($search_keywords, ...$program->search_keywords);
+                }
+
+                foreach ($search_keywords as $key) {
+                    $result[$key->id] = $key->id;
+                }
+
+                foreach ($result as $key => $value) {
+                    $newCourse->search_keywords()->attach($value);
+                }
+
+                $newCourse['topic_courses'] = $newCourse->topic_courses;
+            }
+        }
     }
 
     public function update(Course $slug, Request $request)
