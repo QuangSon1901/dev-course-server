@@ -35,10 +35,10 @@ class SearchController extends Controller
         }
 
         $keyword = SearchKeyword::select('id', 'keyword')->where('keyword', 'LIKE', $request->q . '%')->take(8)->get();
-        $courses = Course::select('id','name', 'slug')->where('name', 'LIKE', $request->q . '%')->take(3)->get();
-        
+        $courses = Course::select('id', 'name', 'slug')->where('name', 'LIKE', $request->q . '%')->take(3)->get();
+
         $result = [...$keyword, ...$courses];
-        
+
         $response = [
             'status' => 200,
             'success' => 'success',
@@ -48,7 +48,8 @@ class SearchController extends Controller
         return response($response, 200);
     }
 
-    public function searchKeyword(Request $request) {
+    public function searchKeyword(Request $request)
+    {
         $validator = Validator::make(
             $request->all(),
             [
@@ -67,16 +68,18 @@ class SearchController extends Controller
             return response(['status' => 403, 'success' => 'danger', 'message' => $validator->errors()], 403);
         }
 
-        $keywords = SearchKeyword::select('id', 'keyword')->where('keyword', 'LIKE', $request->q . '%')->get();
+        $keywords = SearchKeyword::select('id')->where('keyword', 'LIKE', $request->q . '%')->get();
+
+        foreach ($keywords as $keyword) {
+            $key[] = $keyword->id;
+        }
 
         $courses = Course::query()
-        ->whereHas('search_keywords', function ($query) use ($keywords) {
-            foreach ($keywords as $keyword) {
-                $query->where('id', 'like', '%' . $keyword->id . '%');
-            }
-        })
-        ->orWhere('name', 'like', '%' . $request->q . '%')
-        ->paginate(20);
+            ->whereHas('search_keywords', function ($query) use ($key) {
+                $query->whereIn('id', $key);
+            })
+            ->orWhere('name', 'like', '%' . $request->q . '%')
+            ->paginate(20);
 
         $response = [
             'status' => 200,
