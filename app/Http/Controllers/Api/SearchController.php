@@ -34,7 +34,7 @@ class SearchController extends Controller
             return response(['status' => 403, 'success' => 'danger', 'message' => $validator->errors()->first()], 403);
         }
 
-        $keyword = SearchKeyword::select('id', 'keyword')->where('keyword', 'LIKE', $request->q . '%')->take(8)->get();
+        $keyword = SearchKeyword::select('id', 'keyword')->where('keyword', 'LIKE', '%' . $request->q . '%')->take(8)->get();
         $courses = Course::select('id', 'name', 'slug')->where('name', 'LIKE', $request->q . '%')->take(3)->get();
 
         $result = [...$keyword, ...$courses];
@@ -70,21 +70,35 @@ class SearchController extends Controller
 
         $keywords = SearchKeyword::select('id')->where('keyword', 'LIKE', $request->q . '%')->get();
 
-        foreach ($keywords as $keyword) {
-            $key[] = $keyword->id;
-        }
+        if (count($keywords) > 0) {
 
-        $courses = Course::query()
-            ->whereHas('search_keywords', function ($query) use ($key) {
-                $query->whereIn('id', $key);
-            })
-            ->orWhere('name', 'like', '%' . $request->q . '%')
-            ->paginate(20);
+            foreach ($keywords as $keyword) {
+                $key[] = $keyword->id;
+
+                $courses = Course::query()
+                    ->whereHas('search_keywords', function ($query) use ($key) {
+                        $query->whereIn('id', $key);
+                    })
+                    ->orWhere('name', 'like', '%' . $request->q . '%')
+                    ->paginate(20)->onEachSide(1);
+
+                $response = [
+                    'status' => 200,
+                    'success' => 'success',
+                    'result' => $courses,
+                ];
+
+                return response($response, 200);
+            }
+        }
 
         $response = [
             'status' => 200,
             'success' => 'success',
-            'result' => $courses,
+            'result' => [
+                'data' => [],
+                'total' => 0
+            ],
         ];
 
         return response($response, 200);
