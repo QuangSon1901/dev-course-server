@@ -19,12 +19,25 @@ class CourseController extends Controller
         return Course::all();
     }
 
+    public function show_by_slug(Course $slug)
+    {
+        if (!$slug) return response([
+            'status' => 403,
+            'success' => 'danger',
+            'message' => 'Slug is not found'
+        ], 403);
+
+        return response([
+            'status' => 200,
+            'success' => 'success',
+            'course' => $slug
+        ], 200);
+    }
+
     public function store(Request $request)
     {
 
         if (Gate::denies('role-admin')) return response(['message' => 'Xin lỗi! Bạn không có quyền thực hiện.'], 401);
-
-        
 
         $validator = Validator::make(
             $request->all(),

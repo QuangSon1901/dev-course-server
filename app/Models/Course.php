@@ -20,6 +20,8 @@ class Course extends Model
         'description',
         'image',
         'price',
+        'form_of_learning',
+        'level',
         'slug',
         'topic_course_id',
         'create_at',

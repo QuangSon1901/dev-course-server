@@ -6,32 +6,27 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Cviebrock\EloquentSluggable\Sluggable;
 
-class Unit extends Model
+class Lesson extends Model
 {
     use HasFactory;
     use Sluggable;
 
-    protected $table = 'units';
+    protected $table = 'lessons';
 
     protected $fillable = [
         'name',
         'description',
         'image',
+        'video_demo',
+        'video_lectures',
         'z_index',
-        'course_id',
+        'unit_id',
         'slug',
-        'create_at',
-        'update_at',
     ];
 
-    public function courses()
+    public function units()
     {
-        return $this->belongsTo(Course::class, 'course_id');
-    }
-
-    public function lessons()
-    {
-        return $this->hasMany(Lesson::class);
+        return $this->belongsTo(Unit::class, 'unit_id');
     }
 
     public function sluggable()

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\AutomaticController;
 use App\Http\Controllers\Api\CategoryCourseController;
 use App\Http\Controllers\Api\ClassRoomController;
 use App\Http\Controllers\Api\ClassUserController;
@@ -85,9 +86,15 @@ Route::group(['prefix' => '/classes'], function () {
 // Courses
 Route::group(['prefix' => '/courses'], function () {
     Route::get('/', [CourseController::class, 'show']);
+    Route::get('/{slug}', [CourseController::class, 'show_by_slug']);
 });
 
 // Courses
+Route::group(['prefix' => '/course'], function () {
+    Route::get('/{slug}', [CourseController::class, 'show_by_slug']);
+});
+
+// Combine
 Route::group(['prefix' => '/combine'], function () {
     Route::get('/', [CombineController::class, 'show']);
 });
@@ -179,5 +186,12 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     // order
     Route::group(['prefix' => '/order'], function () {
         Route::get('/', [ClassUserController::class, 'show']);
+    });
+
+    // ===============================================
+
+    // Auto
+    Route::group(['prefix' => '/auto'], function () {
+        Route::post('/courses_store', [AutomaticController::class, 'courses_store']);
     });
 });

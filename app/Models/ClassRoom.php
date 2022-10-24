@@ -4,12 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Cviebrock\EloquentSluggable\Sluggable;
 
 class ClassRoom extends Model
 {
     use HasFactory;
-    use Sluggable;
 
     protected $table = 'class_rooms';
 
@@ -18,8 +16,8 @@ class ClassRoom extends Model
         'quantity_minimum',
         'quantity_maxnimum',
         'opening_day',
+        'estimated_end_time',
         'status',
-        'slug',
         'course_id',
         'room_id',
         'teacher_id',
@@ -28,20 +26,6 @@ class ClassRoom extends Model
         'create_at',
         'update_at',
     ];
-
-    public function sluggable()
-    {
-        return [
-            'slug' => [
-                'source' => 'name'
-            ]
-        ];
-    }
-
-    public function getRouteKeyName()
-    {
-        return 'slug';
-    }
 
     public function rooms()
     {

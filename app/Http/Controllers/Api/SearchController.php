@@ -93,14 +93,10 @@ class SearchController extends Controller
         }
 
         $response = [
-            'status' => 200,
-            'success' => 'success',
-            'result' => [
-                'data' => [],
-                'total' => 0
-            ],
+            'status' => 403,
+            'success' => 'danger',
         ];
 
-        return response($response, 200);
+        return response($response, 403);
     }
 }
