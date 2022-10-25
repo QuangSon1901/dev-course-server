@@ -64,6 +64,7 @@ class AutomaticController extends Controller
                 'level' => $course['level'],
                 'topic_course_id' => $request->topic_course_id,
                 'slug' => $slug . '-' . $uuid,
+                'objectives' => json_encode($course['objectives'])
             ];
 
             if ($course['image']) {
@@ -87,7 +88,7 @@ class AutomaticController extends Controller
         return response([
             'status' => 200,
             'success' => 'success',
-            'message' => 'Successfully!'
+            'message' => "Done. Time execute: $timeExecute"
         ], 200);
     }
 }

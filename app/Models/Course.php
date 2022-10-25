@@ -18,6 +18,7 @@ class Course extends Model
         'sub_name',
         'video_demo',
         'description',
+        'objectives',
         'image',
         'price',
         'form_of_learning',

@@ -27,10 +27,29 @@ class CourseController extends Controller
             'message' => 'Slug is not found'
         ], 403);
 
+        $total_lectures = 0;
+        foreach ($slug->units as $unit) {
+            $total_lectures += $unit->lessons->count();
+        }
+
         return response([
             'status' => 200,
             'success' => 'success',
-            'course' => $slug
+            'course' => [
+                'id' => $slug->id,
+                'name' => $slug->name,
+                'sub_name' => $slug->sub_name,
+                'description' => $slug->description,
+                'objectives' => json_decode($slug->objectives),
+                'image' => $slug->image,
+                'price' => $slug->price,
+                'form_of_learning' => $slug->form_of_learning,
+                'level' => $slug->level,
+                'slug' => $slug->slug,
+                'topic_course_id' => $slug->topic_course_id,
+                'total_sections' => $slug->units->count(),
+                'total_lectures' => $total_lectures,
+            ]
         ], 200);
     }
 
@@ -73,7 +92,7 @@ class CourseController extends Controller
             ]
         );
 
-        
+
 
         if ($validator->fails()) {
             return response(['status' => 403, 'success' => 'danger', 'message' => $validator->errors()->first()], 403);
@@ -122,17 +141,17 @@ class CourseController extends Controller
 
             $search_keywords = array();
             array_push($search_keywords, ...$checkTopic->search_keywords);
-    
-    
+
+
             foreach ($checkTopic->category_courses as $category_course) {
                 array_push($search_keywords, ...$category_course->search_keywords);
                 $programs[$category_course->program_id] = $category_course->programs;
             }
-    
+
             foreach ($programs as $program) {
                 array_push($search_keywords, ...$program->search_keywords);
             }
-            
+
             foreach ($search_keywords as $key) {
                 $result[$key->id] = $key->id;
             }
@@ -141,7 +160,7 @@ class CourseController extends Controller
                 $newCourse->search_keywords()->attach($value);
             }
 
-            $newCourse['topic_courses'] = $newCourse->topic_courses; 
+            $newCourse['topic_courses'] = $newCourse->topic_courses;
 
             $response = [
                 'status' => 201,

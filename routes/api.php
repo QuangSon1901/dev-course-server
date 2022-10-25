@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\ImageController;
 use App\Http\Controllers\Api\ResetPasswordController;
 use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\TopicCourseController;
+use App\Http\Controllers\Api\UnitController;
 use App\Models\CategoryCourse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -92,6 +93,11 @@ Route::group(['prefix' => '/courses'], function () {
 // Courses
 Route::group(['prefix' => '/course'], function () {
     Route::get('/{slug}', [CourseController::class, 'show_by_slug']);
+});
+
+// Units
+Route::group(['prefix' => '/units'], function () {
+    Route::get('/units-by-course', [UnitController::class, 'units_by_course']);
 });
 
 // Combine
