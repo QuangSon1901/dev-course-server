@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\AutoCourse;
 use App\Models\ClassRoom;
 use App\Models\Course;
 use App\Models\Lesson;
@@ -47,6 +48,7 @@ class AutomaticController extends Controller
         ], 401);
 
         $file_json = json_decode(file_get_contents($request->file_json), true);
+        $startTime = microtime(true);
 
         foreach ($file_json as $course) {
             $slug = SlugService::createSlug(Course::class, 'slug', $course['name']);
@@ -54,9 +56,9 @@ class AutomaticController extends Controller
 
             $data = [
                 'name' => $course['name'],
-                'sub_name' => $course['sub_name'],
-                'video_demo' => $course['video_url'],
-                'description' => $course['description'],
+                'sub_name' => $course['sub_name']  ?: '',
+                'video_demo' => $course['video_url'] ?: '',
+                'description' => $course['description'] ?: '',
                 'price' => $course['price'],
                 'form_of_learning' => 'Online',
                 'level' => $course['level'],
@@ -74,74 +76,13 @@ class AutomaticController extends Controller
                 $data['image'] = $filename;
             }
 
-            $newCourse = Course::create($data);
-            if ($newCourse) {
-
-                // Add Teacher
-                $teacher = Teacher::updateOrCreate([
-                    'name' => $course['teacher'][0]['title']
-                ], ['name' => $course['teacher'][0]['title']]);
-
-                // Add Class
-                ClassRoom::updateOrCreate([
-                    'course_id' => $newCourse->id
-                ], [
-                    'name' => substr(Str::uuid()->toString(), 0, 8),
-                    'status' => 0,
-                    'course_id' => $newCourse->id,
-                    'teacher_id' => $teacher->id
-                ]);
-
-
-                // Add Search
-                $search_keywords = array();
-                array_push($search_keywords, ...$checkTopic->search_keywords);
-
-
-                foreach ($checkTopic->category_courses as $category_course) {
-                    array_push($search_keywords, ...$category_course->search_keywords);
-                    $programs[$category_course->program_id] = $category_course->programs;
-                }
-
-                foreach ($programs as $program) {
-                    array_push($search_keywords, ...$program->search_keywords);
-                }
-
-                foreach ($search_keywords as $key) {
-                    $result[$key->id] = $key->id;
-                }
-
-                foreach ($result as $key => $value) {
-                    $newCourse->search_keywords()->attach($value);
-                }
-
-                $newCourse['topic_courses'] = $newCourse->topic_courses;
-
-                // Add Units
-                foreach($course['units'] as $unit) {
-                    $newUnit = Unit::create([
-                        'name' => $unit['title'],
-                        'z_index' => $unit['index'],
-                        'slug' => SlugService::createSlug(Unit::class, 'slug', $unit['title']),
-                        'course_id' => $newCourse->id,
-                    ]);
-
-                    if ($newUnit) {
-                        foreach($unit['items'] as $lesson) {
-                            Lesson::create([
-                                'name' => $lesson['title'],
-                                'description' => $lesson['description'],
-                                'z_index' => $lesson['object_index'],
-                                'slug' => SlugService::createSlug(Lesson::class, 'slug', $lesson['title']),
-                                'unit_id' => $newUnit->id
-                            ]);
-                        }
-                    }
-                }
-
-                // echo $newCourse;
-            }
+            $sendCourseJob = new AutoCourse($course, $data, $checkTopic);
+            dispatch($sendCourseJob);
         }
+
+        $endTime = microtime(true);
+        $timeExecute = $endTime - $startTime;
+
 
         return response([
             'status' => 200,
