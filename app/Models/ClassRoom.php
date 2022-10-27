@@ -54,6 +54,6 @@ class ClassRoom extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'classes_users', 'class_id', 'user_id')->withPivot('date','price','status', 'certificate_id');
+        return $this->belongsToMany(User::class, 'classes_users', 'class_id', 'user_id')->withPivot('vendor_order_id', 'date','price','status', 'certificate_id');
     }
 }
