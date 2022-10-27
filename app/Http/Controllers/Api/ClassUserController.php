@@ -7,6 +7,7 @@ use App\Models\ClassesUsers;
 use App\Models\ClassRoom;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ClassUserController extends Controller
 {
@@ -22,4 +23,6 @@ class ClassUserController extends Controller
 
         return response($response, 201);
     }
+
+    
 }

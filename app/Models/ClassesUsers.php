@@ -14,6 +14,7 @@ class ClassesUsers extends Model
     protected $fillable = [
         'user_id',
         'class_id',
+        'vendor_order_id',
         'date',
         'price',
         'status',

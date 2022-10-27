@@ -69,6 +69,7 @@ class CourseController extends Controller
                 'topic_course_id' => $slug->topic_course_id,
                 'total_sections' => $slug->units->count(),
                 'total_lectures' => $total_lectures,
+                'class_room' => $slug->class_rooms,
             ]
         ], 200);
     }

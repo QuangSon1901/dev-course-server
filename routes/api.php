@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\TimeFrameController;
 use App\Http\Controllers\Api\WeekDayController;
 use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\ImageController;
+use App\Http\Controllers\Api\PaypalPaymentController;
 use App\Http\Controllers\Api\ResetPasswordController;
 use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\TopicCourseController;
@@ -120,6 +121,12 @@ Route::group(['prefix' => '/combine'], function () {
 
 // Private router
 Route::group(['middleware' => ['auth:sanctum']], function () {
+
+    // Paypal
+    Route::group(['prefix'=>'paypal'], function(){
+        Route::post('/order/create',[PaypalPaymentController::class,'create']);
+        Route::post('/order/capture',[PaypalPaymentController::class,'capture']);
+    });
 
     // Auth
     Route::group(['prefix' => '/auth'], function () {
