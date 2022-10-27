@@ -95,6 +95,11 @@ Route::group(['prefix' => '/course'], function () {
     Route::get('/{slug}', [CourseController::class, 'show_by_slug']);
 });
 
+// Checkout
+Route::group(['prefix' => '/checkout'], function () {
+    Route::get('/course/{slug}', [CourseController::class, 'show_by_slug_checkout']);
+});
+
 // Units
 Route::group(['prefix' => '/units'], function () {
     Route::get('/units-by-course', [UnitController::class, 'units_by_course']);

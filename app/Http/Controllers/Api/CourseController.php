@@ -18,6 +18,26 @@ class CourseController extends Controller
     {
         return Course::all();
     }
+    
+    public function show_by_slug_checkout(Course $slug) {
+        if (!$slug) return response([
+            'status' => 403,
+            'success' => 'danger',
+            'message' => 'Slug is not found'
+        ], 403);
+        
+        return response([
+            'status' => 200,
+            'success' => 'success',
+            'course' => [
+                'id' => $slug->id,
+                'name' => $slug->name,
+                'image' => $slug->image,
+                'price' => $slug->price,
+                'slug' => $slug->slug
+            ]
+        ], 200);
+    }
 
     public function show_by_slug(Course $slug)
     {
