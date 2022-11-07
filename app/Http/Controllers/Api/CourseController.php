@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\ClassRoom;
 use App\Models\Course;
+use App\Models\Lesson;
 use App\Models\Program;
+use App\Models\Room;
 use App\Models\TopicCourse;
 use Carbon\Carbon;
 use Cviebrock\EloquentSluggable\Services\SlugService;
@@ -52,15 +54,11 @@ class CourseController extends Controller
 
         $total_lectures = 0;
         foreach ($slug->units as $unit) {
-            $total_lectures += $unit->lessons->count();
+            $total_lectures += $unit->lectures->count();
         }
 
 
-        $getClass = $slug->class_rooms->where('status', 0)->first();
-        $getOrder = null;
-        if ($getClass) {
-            $getOrder = $slug->class_rooms->where('status', 0)->first()->users->where('id', $request->user)->first();
-        }
+        $getClass = ClassRoom::where('course_id', $slug->id)->where('status', 1)->get();
 
         return response([
             'status' => 200,
@@ -79,8 +77,7 @@ class CourseController extends Controller
                 'topic_course_id' => $slug->topic_course_id,
                 'total_sections' => $slug->units->count(),
                 'total_lectures' => $total_lectures,
-                'class_room' => $slug->class_rooms,
-                'active' => $getOrder ? $getOrder->pivot->status == 1 : false
+                'active' => count($getClass) > 0 ? true : false
             ]
         ], 200);
     }
@@ -93,24 +90,64 @@ class CourseController extends Controller
             'message' => 'Slug is not found'
         ], 403);
 
-        $classes = $slug->class_rooms->where('status', 1)->where('opening_day', '>', Carbon::now());
+        $classes = ClassRoom::where('course_id', $slug->id)->where('status', 1)->get();
 
         $result = [];
         foreach ($classes as $class) {
             $checkOrder = ClassRoom::find($class['id'])->users->where('id', $request->user)->first();
-            
+            $address = Room::find($class['room_id']);
+
+            $lastWeek = new Carbon($class['opening_day']);
+            $weekdays = $class->schedule->where('date_learn', '>=', $class['opening_day'])->where('date_learn', '<=', $lastWeek->addWeek()->subDay());
+
+            $weekday_string = '';
+            foreach ($weekdays as $item) {
+                $weekday = '';
+                switch (date('w', strtotime($item['date_learn']))) {
+                    case 0:
+                        $weekday = 'Sun';
+                        break;
+                    case 1:
+                        $weekday = 'Mon';
+                        break;
+                    case 2:
+                        $weekday = 'Tue';
+                        break;
+                    case 3:
+                        $weekday = 'Wed';
+                        break;
+                    case 4:
+                        $weekday = 'Thu';
+                        break;
+                    case 5:
+                        $weekday = 'Fri';
+                        break;
+                    case 6:
+                        $weekday = 'Sat';
+                        break;
+                }
+                $weekday_string .= $weekday . ' ';
+            }
+
+            $time_string = '';
+            foreach (array_keys($weekdays->groupBy('lesson')->toArray()) as $item) {
+                $arr_time_temp = explode('-', $item);
+                $min = Lesson::where('lesson', min($arr_time_temp))->first();
+                $max = Lesson::where('lesson', max($arr_time_temp))->first();
+
+                $time_string .= '(' . date('h:i', strtotime($min->time_start)) . '-' . date('h:i', strtotime($max->time_start)) . ') ';
+            }
+
             array_push($result, [
                 'id' => $class['id'],
-                'name' => $class['name'],
+                'class_id' => $class['class_id'],
                 'opening_day' => date('d-m-Y', strtotime($class['opening_day'])),
                 'estimated_end_time' => date('d-m-Y', strtotime($class['estimated_end_time'])),
                 'quantity_minimum' => $class['quantity_minimum'],
                 'quantity_maxnimum' => $class['quantity_maxnimum'],
-                'room_number' => $class['rooms']['room'],
-                'address' => $class['rooms']['address'],
-                'time_start' => date('H:i', strtotime($class['time_frames']['start_time'])),
-                'time_end' => date('H:i', strtotime($class['time_frames']['end_time'])),
-                'week_day' => $class['week_days']['week_day'],
+                'weekdays' => trim($weekday_string),
+                'time' => trim($time_string),
+                'address' => $address->address,
                 'active' => $checkOrder ? $checkOrder->pivot->status == 1 : false
             ]);
         }

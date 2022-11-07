@@ -42,7 +42,7 @@ class ClassRoom extends Model
 
     public function schedule()
     {
-        return $this->hasMany(Schedule::class);
+        return $this->hasMany(Schedule::class, 'class_id');
     }
 
     public function users()

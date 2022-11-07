@@ -34,26 +34,26 @@ class UnitController extends Controller
 
         if (!$checkCourse) return response(['status' => 403, 'success' => 'danger', 'message' => 'Course is not found!'], 403);
 
-        $units = Unit::with('lessons')->withCount('lessons')->where('course_id', $request->course_id)->get();
+        $units = Unit::with('lectures')->withCount('lectures')->where('course_id', $request->course_id)->get();
 
         return response(['status' => 200, 'success' => 'success', 'data' => [
             'total_sections' => $units->count(),
             'total_lectures' => array_sum(array_map(function ($unit) {
-                return $unit['lessons_count'];
+                return $unit['lectures_count'];
             }, $units->toArray())),
             'units' => array_map(function ($unit) {
                 return [
                     'id' => $unit['id'],
                     'name' => $unit['name'],
                     'z_index' => $unit['z_index'],
-                    'lessons_count' => $unit['lessons_count'],
-                    'lessons' => array_map(function ($lesson) {
+                    'lectures_count' => $unit['lectures_count'],
+                    'lectures' => array_map(function ($lecture) {
                         return [
-                            'id' => $lesson['id'],
-                            'name' => $lesson['name'],
-                            'z_index' => $lesson['z_index'],
+                            'id' => $lecture['id'],
+                            'name' => $lecture['name'],
+                            'z_index' => $lecture['z_index'],
                         ];
-                    }, $unit['lessons'])
+                    }, $unit['lectures'])
                 ];
             }, $units->toArray())
         ]], 200);
