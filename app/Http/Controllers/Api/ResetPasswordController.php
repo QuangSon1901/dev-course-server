@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Mail\UserEmail;
 use App\Models\PasswordReset;
 use App\Models\User;
 use App\Notifications\ResetPasswordRequest;
@@ -11,6 +12,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class ResetPasswordController extends Controller
 {
@@ -119,5 +121,18 @@ class ResetPasswordController extends Controller
             'message' => 'Đặt lại mật khẩu thất bại!'
         ];
         return response($response, 403);
+    }
+
+    public function sendEmailReminder(Request $request)
+    {
+        $mailData = [
+            'title' => 'Mail from ItSolutionStuff.com',
+            'body' => 'This is for testing email using smtp.'
+        ];
+         
+        Mail::to('quangsonbmt760@gmail.com')->send(new UserEmail($mailData));
+           
+        dd("Email is sent successfully.");
+        
     }
 }

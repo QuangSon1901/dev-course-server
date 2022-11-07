@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\ClassRoom;
 use App\Models\Course;
 use App\Models\Program;
 use App\Models\TopicCourse;
+use Carbon\Carbon;
 use Cviebrock\EloquentSluggable\Services\SlugService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -18,14 +20,15 @@ class CourseController extends Controller
     {
         return Course::all();
     }
-    
-    public function show_by_slug_checkout(Course $slug) {
+
+    public function show_by_slug_checkout(Course $slug)
+    {
         if (!$slug) return response([
             'status' => 403,
             'success' => 'danger',
             'message' => 'Slug is not found'
         ], 403);
-        
+
         return response([
             'status' => 200,
             'success' => 'success',
@@ -39,7 +42,7 @@ class CourseController extends Controller
         ], 200);
     }
 
-    public function show_by_slug(Course $slug)
+    public function show_by_slug(Course $slug, Request $request)
     {
         if (!$slug) return response([
             'status' => 403,
@@ -50,6 +53,13 @@ class CourseController extends Controller
         $total_lectures = 0;
         foreach ($slug->units as $unit) {
             $total_lectures += $unit->lessons->count();
+        }
+
+
+        $getClass = $slug->class_rooms->where('status', 0)->first();
+        $getOrder = null;
+        if ($getClass) {
+            $getOrder = $slug->class_rooms->where('status', 0)->first()->users->where('id', $request->user)->first();
         }
 
         return response([
@@ -70,7 +80,46 @@ class CourseController extends Controller
                 'total_sections' => $slug->units->count(),
                 'total_lectures' => $total_lectures,
                 'class_room' => $slug->class_rooms,
+                'active' => $getOrder ? $getOrder->pivot->status == 1 : false
             ]
+        ], 200);
+    }
+
+    public function show_class_by_course(Course $slug, Request $request)
+    {
+        if (!$slug) return response([
+            'status' => 403,
+            'success' => 'danger',
+            'message' => 'Slug is not found'
+        ], 403);
+
+        $classes = $slug->class_rooms->where('status', 1)->where('opening_day', '>', Carbon::now());
+
+        $result = [];
+        foreach ($classes as $class) {
+            $checkOrder = ClassRoom::find($class['id'])->users->where('id', $request->user)->first();
+            
+            array_push($result, [
+                'id' => $class['id'],
+                'name' => $class['name'],
+                'opening_day' => date('d-m-Y', strtotime($class['opening_day'])),
+                'estimated_end_time' => date('d-m-Y', strtotime($class['estimated_end_time'])),
+                'quantity_minimum' => $class['quantity_minimum'],
+                'quantity_maxnimum' => $class['quantity_maxnimum'],
+                'room_number' => $class['rooms']['room'],
+                'address' => $class['rooms']['address'],
+                'time_start' => date('H:i', strtotime($class['time_frames']['start_time'])),
+                'time_end' => date('H:i', strtotime($class['time_frames']['end_time'])),
+                'week_day' => $class['week_days']['week_day'],
+                'active' => $checkOrder ? $checkOrder->pivot->status == 1 : false
+            ]);
+        }
+
+
+        return response([
+            'status' => 200,
+            'success' => 'success',
+            'classes' => $result
         ], 200);
     }
 

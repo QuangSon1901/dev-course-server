@@ -15,6 +15,7 @@ class Teacher extends Model
         'name',
         'email',
         'image',
+        'topic_course_id',
         'create_at',
         'update_at',
     ];
@@ -22,5 +23,10 @@ class Teacher extends Model
     public function class_rooms()
     {
         return $this->hasMany(ClassRoom::class);
+    }
+
+    public function topic_courses()
+    {
+        return $this->belongsTo(TopicCourse::class, 'topic_course_id');
     }
 }

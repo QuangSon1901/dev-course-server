@@ -19,6 +19,7 @@ class Course extends Model
         'video_demo',
         'description',
         'objectives',
+        'total_lesson',
         'image',
         'price',
         'form_of_learning',
@@ -41,7 +42,7 @@ class Course extends Model
 
     public function class_rooms()
     {
-        return $this->hasMany(ClassRoom::class);
+        return $this->hasMany(ClassRoom::class)->with('rooms', 'time_frames', 'week_days')->orderBy('opening_day');
     }
 
     public function units()

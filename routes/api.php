@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\ImageController;
 use App\Http\Controllers\Api\PaypalPaymentController;
 use App\Http\Controllers\Api\ResetPasswordController;
+use App\Http\Controllers\Api\ScheduleController;
 use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\TopicCourseController;
 use App\Http\Controllers\Api\UnitController;
@@ -94,6 +95,7 @@ Route::group(['prefix' => '/courses'], function () {
 // Courses
 Route::group(['prefix' => '/course'], function () {
     Route::get('/{slug}', [CourseController::class, 'show_by_slug']);
+    Route::get('/class/{slug}', [CourseController::class, 'show_class_by_course']);
 });
 
 // Checkout
@@ -212,4 +214,15 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::group(['prefix' => '/auto'], function () {
         Route::post('/courses_store', [AutomaticController::class, 'courses_store']);
     });
+
+    // ===============================================
+
+    // Schedule
+    Route::group(['prefix' => '/schedule'], function () {
+        Route::post('/', [ScheduleController::class, 'schedule']);
+    });
 });
+
+
+Route::get('/send_email', [ResetPasswordController::class, 'sendEmailReminder']);
+Route::post('/check', [TeacherController::class, 'check']);

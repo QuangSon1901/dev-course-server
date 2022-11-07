@@ -70,6 +70,10 @@ class PaypalPaymentController extends Controller
                 'vendor_order_id' => $order['id'],
                 'date' => Carbon::now(),
                 'price' => $request->price,
+                'name' => $request->name,
+                'birth' => date('Y-m-d', strtotime($request->birth)),
+                'email' => $request->email,
+                'phone' => $request->phone,
                 'status' => 0
             ]);
     

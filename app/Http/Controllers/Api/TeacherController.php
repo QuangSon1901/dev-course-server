@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\ClassRoom;
+use App\Models\Course;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -150,5 +152,33 @@ class TeacherController extends Controller
             'success' => 'danger',
             'message' => 'Xoá thất bại!'
         ], 401);
+    }
+
+    public function check(Request $request) {
+
+        $classes = Course::select('id')->where('topic_course_id', $request->id)->get();
+        $classes = array_map(function($item) {
+            return $item['id'];
+        }, $classes->toArray());
+
+        if (count($classes) <= 0) return response([
+            'status' => 200,
+            'message' => 'Array empty!',
+        ], 200);
+
+        $teacher = Teacher::query()
+            ->whereHas('class_rooms', function($query) use ($classes) {
+                return $query->whereIn('id', $classes);
+            })
+            ->groupBy('id')
+            ->update([
+                'topic_course_id' => $request->id
+            ]);
+
+
+        return response([
+            'status' => 200,
+            'data' => $teacher,
+        ], 200);
     }
 }

@@ -12,7 +12,7 @@ class ClassRoom extends Model
     protected $table = 'class_rooms';
 
     protected $fillable = [
-        'name',
+        'class_id',
         'quantity_minimum',
         'quantity_maxnimum',
         'opening_day',
@@ -21,8 +21,6 @@ class ClassRoom extends Model
         'course_id',
         'room_id',
         'teacher_id',
-        'time_frame_id',
-        'week_day_id',
         'create_at',
         'update_at',
     ];
@@ -42,14 +40,9 @@ class ClassRoom extends Model
         return $this->belongsTo(Teacher::class, 'teacher_id');
     }
 
-    public function time_frames()
+    public function schedule()
     {
-        return $this->belongsTo(TimeFrame::class, 'time_frame_id');
-    }
-
-    public function week_days()
-    {
-        return $this->belongsTo(WeekDay::class, 'week_day_id');
+        return $this->hasMany(Schedule::class);
     }
 
     public function users()

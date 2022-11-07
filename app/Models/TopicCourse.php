@@ -37,6 +37,11 @@ class TopicCourse extends Model
         return $this->belongsToMany(CategoryCourse::class, 'category_topic_courses', 'topic_course_id', 'category_course_id');
     }
 
+    public function teachers()
+    {
+        return $this->hasMany(Teacher::class);
+    }
+
     public function sluggable()
     {
         return [

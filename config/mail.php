@@ -32,7 +32,6 @@ return [
     |            "postmark", "log", "array", "failover"
     |
     */
-
     'mailers' => [
         'smtp' => [
             'transport' => 'smtp',
@@ -51,6 +50,8 @@ return [
 
         'mailgun' => [
             'transport' => 'mailgun',
+            'domain' => 'sandbox62956c29847a4ea693ad488d99a2e93b.mailgun.org',
+            'secret' => '42525536e80324fafed5ae1990fc58bc-8845d1b1-e3acf0a5'
         ],
 
         'postmark' => [
@@ -92,8 +93,8 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
-        'name' => env('MAIL_FROM_NAME', 'Example'),
+        'address' => env('MAIL_FROM_ADDRESS', 'qsccompanycity@gmail.com'),
+        'name' => env('MAIL_FROM_NAME', 'QSC City'),
     ],
 
     /*
