@@ -123,7 +123,6 @@ Route::group(['prefix' => '/combine'], function () {
 
 // Private router
 Route::group(['middleware' => ['auth:sanctum']], function () {
-
     // Paypal
     Route::group(['prefix'=>'paypal'], function(){
         Route::post('/order/create',[PaypalPaymentController::class,'create']);
@@ -220,6 +219,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     // Schedule
     Route::group(['prefix' => '/schedule'], function () {
         Route::post('/', [ScheduleController::class, 'schedule']);
+    });
+
+    // ===============================================
+    Route::group(['prefix' => '/me/learning'], function () {
+        Route::get('/', [UserController::class, 'get_learning_user']);
+        Route::get('/class/{class}', [UserController::class, 'get_class_user']);
+        Route::get('/schedule/{class}', [UserController::class, 'get_schedule_byclass_user']);
+        Route::get('/schedule', [UserController::class, 'get_schedule_user']);
     });
 });
 
