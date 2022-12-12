@@ -74,22 +74,42 @@ class SearchController extends Controller
 
             foreach ($keywords as $keyword) {
                 $key[] = $keyword->id;
-
-                $courses = Course::query()
-                    ->whereHas('search_keywords', function ($query) use ($key) {
-                        $query->whereIn('id', $key);
-                    })
-                    ->orWhere('name', 'like', '%' . $request->q . '%')
-                    ->paginate(20)->onEachSide(1);
-
-                $response = [
-                    'status' => 200,
-                    'success' => 'success',
-                    'result' => $courses,
-                ];
-
-                return response($response, 200);
             }
+
+            $courses = Course::query();
+
+            if ($request->level) {
+                $level = $request->level;
+                $courses = $courses->where(function ($query) use ($level) {
+                    foreach ($level as $key => $value) {
+                        $query->orWhere('level', 'LIKE', '%' . $value . '%');
+                    }
+                });
+            }
+
+            $courses = $courses->where(function ($query1) use ($key, $request) {
+                $query1->whereHas('search_keywords', function ($query) use ($key) {
+                    $query->whereIn('id', $key);
+                })->orWhere('name', 'like', '%' . $request->q . '%');
+            });
+
+            if ($request->sort === 'lowest-price') {
+                $courses = $courses->orderBy('price');
+            } else if ($request->sort === 'highest-price') {
+                $courses = $courses->orderByDesc('price');
+            } else if ($request->sort === 'lastest') {
+                $courses = $courses->orderByDesc('created_at');
+            }
+
+            $courses = $courses->paginate(20)->onEachSide(1);
+
+            $response = [
+                'status' => 200,
+                'success' => 'success',
+                'result' => $courses,
+            ];
+
+            return response($response, 200);
         }
 
         $response = [

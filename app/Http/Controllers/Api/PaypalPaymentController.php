@@ -21,7 +21,7 @@ class PaypalPaymentController extends Controller
             $request->all(),
             [
                 'user_id' => 'required|integer',
-                'class_id' => 'required|integer',
+                'class_id' => 'required|string',
                 'price' => 'required|string',
             ],
             [],
@@ -37,7 +37,7 @@ class PaypalPaymentController extends Controller
         }
 
         $checkUser = User::find($request->user_id);
-        $checkClass = ClassRoom::find($request->class_id);
+        $checkClass = ClassRoom::where('class_id', $request->class_id)->first();
         if (!$checkUser || !$checkClass) return response(['status' => 403, 'success' => 'danger', 'message' => 'Error'], 403);
 
         $getOrder = $checkUser->class_rooms->where('id', $checkClass->id)->first();
@@ -91,7 +91,7 @@ class PaypalPaymentController extends Controller
             [
                 'vendor_order_id' => 'required|string',
                 'user_id' => 'required|integer',
-                'class_id' => 'required|integer',
+                'class_id' => 'required|string',
             ],
             [],
             [
@@ -106,7 +106,7 @@ class PaypalPaymentController extends Controller
         }
 
         $checkUser = User::find($request->user_id);
-        $checkClass = ClassRoom::find($request->class_id);
+        $checkClass = ClassRoom::where('class_id', $request->class_id)->first();
         if (!$checkUser || !$checkClass) return response(['status' => 403, 'success' => 'danger', 'message' => 'Error'], 403);
 
         $getOrder = $checkUser->class_rooms->where('id', $checkClass->id)->first();
