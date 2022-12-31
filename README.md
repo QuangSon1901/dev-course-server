@@ -12,10 +12,9 @@ Hệ thống hỗ trợ việc đăng ký khoá học tin học ngay trên trang
 
 # Công nghệ sử dụng
 
-![PHP](https://img.shields.io/badge/php-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
-![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
-![CSS](https://img.shields.io/badge/css-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white)
-![HTML](https://img.shields.io/badge/html-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white)
+![PHP](https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white)
+![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-005C84?style=for-the-badge&logo=mysql&logoColor=white)
 
 <details>
 <summary>
@@ -24,10 +23,10 @@ Hệ thống hỗ trợ việc đăng ký khoá học tin học ngay trên trang
 
 ## Bắt đầu
 
-Đầu tiên, cài đặt node module:
+Đầu tiên, cài đặt gói:
 
 ```bash
-npm install
+conmposer install
 ```
 
 ## Chạy dự án
@@ -35,19 +34,10 @@ npm install
 Trong thư mục dự án, bạn có thể chạy:
 
 ```bash
-npm start
+php artisan server
 ```
 
 Chạy ứng dụng ở môi trường local.\
-Open [http://localhost:3000](http://localhost:3000) để xem nó trong trình duyệt của bạn.
-
-## Deploy dự án
-
-```bash
-npm run build
-```
-
-Xây dựng ứng dụng cho môi trường production vào thư mục `build`.\
-Nó kết hợp chính xác React cho môi trường production và tối ưu hóa bản dựng để có hiệu suất tốt nhất.
-
+Open [http://localhost:8080](http://localhost:8080) để xem nó trong trình duyệt của bạn.
+    
 </details>
