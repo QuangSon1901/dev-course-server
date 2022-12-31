@@ -6,7 +6,7 @@
 </div>
 <br/>
 
-Phần server
+Phía máy chủ (server)
 
 # Giới thiệu
 
