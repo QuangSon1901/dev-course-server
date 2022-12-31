@@ -119,19 +119,19 @@ class ScheduleController extends Controller
         $assignment_table = $this->assignment_1($classesInit, $teachersInit);
 
         // Thêm danh sách lớp vào cơ sở dữ liệu
-        // foreach ($assignment_table as $item) {
-        //     ClassRoom::create([
-        //         'class_id' => $item['class_id'],
-        //         'quantity_minimum' => 10,
-        //         'quantity_maxnimum' => 30,
-        //         'opening_day' => new Carbon($item['opening']),
-        //         'estimated_end_time' => (new Carbon($item['opening']))->addWeeks($item['total_weeks']),
-        //         'status' => 1,
-        //         'course_id' => $course_id->id,
-        //         'room_id' => $item['room'],
-        //         'teacher_id' => $item['teacher']
-        //     ]);
-        // }
+        foreach ($assignment_table as $item) {
+            ClassRoom::create([
+                'class_id' => $item['class_id'],
+                'quantity_minimum' => 10,
+                'quantity_maxnimum' => 30,
+                'opening_day' => new Carbon($item['opening']),
+                'estimated_end_time' => (new Carbon($item['opening']))->addWeeks($item['total_weeks']),
+                'status' => 1,
+                'course_id' => $course_id->id,
+                'room_id' => $item['room'],
+                'teacher_id' => $item['teacher']
+            ]);
+        }
 
         //Rã cụm phân công
         $assignment_table2 = $this->assignment_2($assignment_table);
@@ -145,12 +145,6 @@ class ScheduleController extends Controller
 
         //Rãi thời khoá biểu
         $schedule_spreaded = $this->schedule_spreaded($phan_tach_opening, $schedule);
-        
-        return response([
-            'status' => 200,
-            'message' => 'Successfully!',
-            'message' => $schedule_spreaded,
-        ], 200);
 
         // Group by từng lớp
         $group_by_class = [];
@@ -175,17 +169,17 @@ class ScheduleController extends Controller
         }
 
         // Thêm danh sách lịch học của các lớp vào cơ sở dữ liệu
-        // foreach ($group_by_class as $class_id => $info) {
-        //     foreach ($info as $date => $lesson) {
-        //         $lesson_string = collect($lesson)->implode('-');
-        //         $class = ClassRoom::where('class_id', $class_id)->first();
-        //         Schedule::create([
-        //             'date_learn' => new Carbon($date),
-        //             'lesson' => $lesson_string,
-        //             'class_id' => $class->id
-        //         ]);
-        //     }
-        // }
+        foreach ($group_by_class as $class_id => $info) {
+            foreach ($info as $date => $lesson) {
+                $lesson_string = collect($lesson)->implode('-');
+                $class = ClassRoom::where('class_id', $class_id)->first();
+                Schedule::create([
+                    'date_learn' => new Carbon($date),
+                    'lesson' => $lesson_string,
+                    'class_id' => $class->id
+                ]);
+            }
+        }
 
         return response([
             'status' => 200,

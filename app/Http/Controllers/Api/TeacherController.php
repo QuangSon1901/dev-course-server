@@ -13,7 +13,11 @@ use Illuminate\Support\Facades\Validator;
 class TeacherController extends Controller
 {
     public function show() {
-        return Teacher::all();
+        if (Gate::denies('role-admin')) return response(['message' => 'Xin lỗi! Bạn không có quyền thực hiện.'], 401);
+
+        return response([
+            'teachers' => Teacher::paginate(10)
+        ], 201);
     }
 
     public function store(Request $request) {

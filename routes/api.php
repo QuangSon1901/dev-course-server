@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\ScheduleController;
 use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\TopicCourseController;
 use App\Http\Controllers\Api\UnitController;
+use App\Http\Controllers\Api\VNPayController;
 use App\Models\CategoryCourse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -31,6 +32,7 @@ use Illuminate\Support\Facades\Route;
 Route::group(['prefix' => '/auth'], function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/admin/login', [AuthController::class, 'adminLogin']);
 
     Route::post('reset-password', [ResetPasswordController::class, 'sendMail']);
     Route::put('reset-password/{token}', [ResetPasswordController::class, 'reset']);
@@ -120,6 +122,7 @@ Route::group(['prefix' => '/combine'], function () {
 // ================================================================
 
 
+Route::get('/vnpay/order/capture',[VNPayController::class,'capture']);
 
 // Private router
 Route::group(['middleware' => ['auth:sanctum']], function () {
@@ -129,6 +132,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/order/capture',[PaypalPaymentController::class,'capture']);
     });
 
+    Route::group(['prefix'=>'vnpay'], function(){
+        Route::post('/order/create',[VNPayController::class,'createVN']);
+
+    });
+
     // Auth
     Route::group(['prefix' => '/auth'], function () {
         Route::get('/', [UserController::class, 'getUser']);
@@ -136,8 +144,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     });
 
     // Programs
-    Route::group(['prefix' => '/programs'], function () {
+    Route::group(['prefix' => '/admin/programs'], function () {
         Route::post('/', [ProgramController::class, 'store']);
+        Route::get('/', [ProgramController::class, 'adminShow']);
         Route::put('/{slug}', [ProgramController::class, 'update']);
         Route::delete('/{slug}', [ProgramController::class, 'destroy']);
     });
@@ -167,8 +176,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     });
 
     // Teachers
-    Route::group(['prefix' => '/teachers'], function () {
+    Route::group(['prefix' => '/admin/teachers'], function () {
         Route::post('/', [TeacherController::class, 'store']);
+        Route::get('/', [TeacherController::class, 'show']);
         Route::put('/{idTeacher}', [TeacherController::class, 'update']);
         Route::delete('/{idTeacher}', [TeacherController::class, 'destroy']);
     });
@@ -197,6 +207,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     // Courses
     Route::group(['prefix' => '/courses'], function () {
         Route::post('/', [CourseController::class, 'store']);
+        Route::get('/', [CourseController::class, 'show']);
         Route::post('/store_auto', [CourseController::class, 'store_auto']);
         Route::put('/{slug}', [CourseController::class, 'update']);
         Route::delete('/{slug}', [CourseController::class, 'destroy']);

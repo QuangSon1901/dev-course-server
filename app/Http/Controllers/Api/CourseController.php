@@ -20,7 +20,10 @@ class CourseController extends Controller
 {
     public function show()
     {
-        return Course::all();
+        if (Gate::denies('role-admin')) return response(['message' => 'Xin lỗi! Bạn không có quyền thực hiện.'], 401);
+        return response([
+            'courses' => Course::paginate(10)
+        ], 201);
     }
 
     public function show_by_slug_checkout(Course $slug)

@@ -37,6 +37,13 @@ class ProgramController extends Controller
         ], 201);
     }
 
+    public function adminShow() {
+        if (Gate::denies('role-admin')) return response(['message' => 'Xin lỗi! Bạn không có quyền thực hiện.'], 401);
+        return response([
+            'programs' => Program::paginate(10)
+        ], 201);
+    }
+
     public function store(Request $request)
     {
 

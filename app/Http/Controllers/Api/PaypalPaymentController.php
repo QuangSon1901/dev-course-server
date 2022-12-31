@@ -41,9 +41,9 @@ class PaypalPaymentController extends Controller
         if (!$checkUser || !$checkClass) return response(['status' => 403, 'success' => 'danger', 'message' => 'Error'], 403);
 
         $getOrder = $checkUser->class_rooms->where('id', $checkClass->id)->first();
-        
+
         if ($getOrder && $getOrder->pivot->status == 0) $checkUser->class_rooms()->detach($checkClass->id);
-        else if ($getOrder && $getOrder->pivot->status == 1) return response(['status' => 403, 'success' => 'danger', 'message' => 'You have already enroll for this course!'], 403);        
+        else if ($getOrder && $getOrder->pivot->status == 1) return response(['status' => 403, 'success' => 'danger', 'message' => 'You have already enroll for this course!'], 403);
 
         $provider  = new PayPalClient();
 
@@ -76,7 +76,7 @@ class PaypalPaymentController extends Controller
                 'phone' => $request->phone,
                 'status' => 0
             ]);
-    
+
             return response()->json($order);
         }
 
@@ -140,6 +140,7 @@ class PaypalPaymentController extends Controller
                 'result' => $result
             ], 403);
         }
-        
     }
+
+    
 }
